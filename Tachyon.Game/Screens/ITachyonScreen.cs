@@ -1,0 +1,18 @@
+﻿﻿using osu.Framework.Screens;
+
+namespace Tachyon.Game.Screens
+{
+    public interface ITachyonScreen : IScreen
+    {
+        /// <summary>
+        /// Whether a top-level component should be allowed to exit the current screen to, for example,
+        /// complete an import. Note that this can be overridden by a user if they specifically request.
+        /// </summary>
+        bool AllowExternalScreenChange { get; }
+
+        /// <summary>
+        /// Whether this <see cref="TachyonScreen"/> allows the cursor to be displayed.
+        /// </summary>
+        bool CursorVisible { get; }
+    }
+}

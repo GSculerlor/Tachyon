@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Title>Tachyon Resources</Title>
+        <Product>Tachyon Resources</Product>
+        <Company>ganen.moe</Company>
+    </PropertyGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Fonts\**\*" />
+        <EmbeddedResource Include="Samples\**\*" />
+        <EmbeddedResource Include="Skins\**\*" />
+        <EmbeddedResource Include="Shaders\**\*" />
+        <EmbeddedResource Include="Textures\**\*" />
+        <EmbeddedResource Include="Tracks\**\*" />
+    </ItemGroup>
+</Project>
