@@ -6,6 +6,8 @@ using osu.Framework.Screens;
 {
     public abstract class TachyonScreen : Screen, ITachyonScreen
     {
+        public virtual bool AllowBackButton => true;
+        
         public bool AllowExternalScreenChange => false;
 
         public bool CursorVisible => true;

@@ -6,8 +6,9 @@ using osu.Framework.Testing;
 using osuTK.Graphics;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Backgrounds;
+ using Tachyon.Game.Screens.Menu;
 
-namespace Tachyon.Game.Tests.Visual.Screens
+ namespace Tachyon.Game.Tests.Visual.Screens
 {
     [TestFixture]
     public class TestSceneScreenStack : TestScene
@@ -26,10 +27,14 @@ namespace Tachyon.Game.Tests.Visual.Screens
         [Test]
         public void PushScreenTest()
         {
-            TestTachyonScreen screen = null;
+            TestTachyonScreen backgroundScreenDefault = null;
+            IntroScreen introScreen = null;
             
-            AddStep("Push default background screen", () => screenStack.Push(screen = new TestTachyonScreen("Default Background Screen")));
-            AddUntilStep("Wait for current", () => screen.IsLoaded);
+            
+            AddStep("Push default background screen", () => screenStack.Push(backgroundScreenDefault = new TestTachyonScreen("Default Background Screen")));
+            AddUntilStep("Wait for current", () => backgroundScreenDefault.IsLoaded);
+            AddStep("Push intro screen", () => screenStack.Push(introScreen = new IntroScreen()));
+            AddUntilStep("Wait for current", () => introScreen.IsLoaded);
         }
 
         private class TestTachyonScreen : BackgroundScreenDefault

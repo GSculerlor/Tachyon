@@ -9,7 +9,6 @@ namespace Tachyon.Game.Graphics
     public class Background : CompositeDrawable
     {
         private readonly Sprite Sprite;
-
         private readonly string textureName;
 
         public Background(string textureName = @"")
