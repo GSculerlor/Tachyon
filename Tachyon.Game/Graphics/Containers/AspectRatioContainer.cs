@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Tachyon.Game.Screens.Containers
+namespace Tachyon.Game.Graphics.Containers
 {
     public class AspectRatioContainer : Container
     {

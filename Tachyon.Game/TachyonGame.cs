@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -18,7 +19,7 @@ namespace Tachyon.Game
 {
     public class TachyonGame : TachyonGameBase
     {
-        protected TachyonScreenStack ScreenStack;
+        private TachyonScreenStack ScreenStack;
         
         private IntroScreen introScreen;
 
@@ -43,8 +44,7 @@ namespace Tachyon.Game
 
             AddRange(new Drawable[]
             {
-                //TODO: Using scalable container
-                new Container
+                new ScalingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -59,6 +59,8 @@ namespace Tachyon.Game
             
             ScreenStack.Push(introScreen = new IntroScreen());
         }
+        
+        protected override Container CreateScalingContainer() => new ScalingContainer();
         
         private Task asyncLoadStream;
         

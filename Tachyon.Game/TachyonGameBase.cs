@@ -1,6 +1,11 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
+using Tachyon.Game.Configuration;
 using Tachyon.Game.Graphics;
 
 namespace Tachyon.Game
@@ -9,6 +14,12 @@ namespace Tachyon.Game
     {
         private DependencyContainer dependencies;
 
+        private TachyonConfigManager LocalConfig;
+
+        private Bindable<bool> fpsDisplayVisible;
+
+        private Storage Storage { get; set; }
+        
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -22,6 +33,7 @@ namespace Tachyon.Game
             dependencies.Cache(largeStore);
             
             dependencies.CacheAs(this);
+            dependencies.Cache(LocalConfig);
             
             AddFont(Resources, @"Fonts/Exo2.0-Medium");
             AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
@@ -47,6 +59,33 @@ namespace Tachyon.Game
             AddFont(Resources, @"Fonts/Venera-Medium");
             
             dependencies.Cache(new TachyonColor());
+            
+            base.Content.Add(CreateScalingContainer());
+        }
+        
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
+        
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            
+            //TODO: Change this hardcoded config when setting is implemented
+            fpsDisplayVisible = new Bindable<bool>(true);
+            fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.TriggerChange();
+
+            FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
+        }
+
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+            
+            if (Storage == null)
+                Storage = host.Storage;
+
+            if (LocalConfig == null)
+                LocalConfig = new TachyonConfigManager(Storage);
         }
     }
 }

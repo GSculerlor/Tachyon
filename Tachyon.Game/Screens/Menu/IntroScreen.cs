@@ -9,8 +9,8 @@ using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Screens.Backgrounds;
-using Tachyon.Game.Screens.Containers;
 
 namespace Tachyon.Game.Screens.Menu
 {
