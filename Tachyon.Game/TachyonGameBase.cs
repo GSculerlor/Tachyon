@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using Tachyon.Game.Graphics;
 
 namespace Tachyon.Game
 {
@@ -44,6 +45,8 @@ namespace Tachyon.Game
             AddFont(Resources, @"Fonts/Venera");
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Medium");
+            
+            dependencies.Cache(new TachyonColor());
         }
     }
 }
