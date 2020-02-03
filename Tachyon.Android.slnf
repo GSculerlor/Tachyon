@@ -2,7 +2,7 @@
   "solution": {
     "path": "Tachyon.sln",
     "projects": [
-      "Tachyon.Desktop\\Tachyon.Desktop.csproj",
+      "Tachyon.Android\\Tachyon.Android.csproj",
       "Tachyon.Game\\Tachyon.Game.csproj",
       "Tachyon.Game.Tests\\Tachyon.Game.Tests.csproj",
       "Tachyon.Resources\\Tachyon.Resources.csproj"
