@@ -12,7 +12,7 @@ namespace Tachyon.Game.Screens.Backgrounds
     {
         private Background background;
         
-        private static string backgroundName => @"Characters/Exusiai";
+        private static string backgroundName => @"Characters/Exusiai_1";
 
         [BackgroundDependencyLoader]
         private void load()

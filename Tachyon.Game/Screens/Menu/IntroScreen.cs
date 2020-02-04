@@ -39,7 +39,7 @@ namespace Tachyon.Game.Screens.Menu
         
         private class IntroBackgroundImage : Background
         {
-            private const string textureName = @"Characters/Exusiai";
+            private const string textureName = @"Characters/Exusiai_2";
 
             public IntroBackgroundImage() : base(textureName)
             {
