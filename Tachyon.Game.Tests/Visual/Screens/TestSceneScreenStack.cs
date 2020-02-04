@@ -7,11 +7,12 @@ using osuTK.Graphics;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Backgrounds;
  using Tachyon.Game.Screens.Menu;
+ using Tachyon.Game.Testing.Visual;
 
  namespace Tachyon.Game.Tests.Visual.Screens
 {
     [TestFixture]
-    public class TestSceneScreenStack : TestScene
+    public class TestSceneScreenStack : TachyonTestScene
     {
         private TestTachyonScreenStack screenStack;
         
