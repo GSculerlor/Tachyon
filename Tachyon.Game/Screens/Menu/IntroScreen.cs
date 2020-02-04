@@ -75,10 +75,10 @@ namespace Tachyon.Game.Screens.Menu
                                 {
                                     Bottom = 5,
                                 },
-                                Font = TachyonFont.GetFont(Typeface.Exo, 20, FontWeight.Bold),
+                                Font = TachyonFont.GetFont(Typeface.Exo, 26, FontWeight.Bold),
                                 Text = @"Tachyon",
                             },
-                            new TextFlowContainer(text => { text.Font = text.Font.With(size: 14); })
+                            new TextFlowContainer(text => { text.Font = text.Font.With(size: 18); })
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -127,7 +127,7 @@ namespace Tachyon.Game.Screens.Menu
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
-                        Height = 0.4f,
+                        Height = 0.5f,
                         Masking = true,
                         Multiplier = 1,
                         Children = new Drawable[]
