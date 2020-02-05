@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using Tachyon.Game.Graphics.Containers;
+using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -19,7 +20,9 @@ namespace Tachyon.Game
 {
     public class TachyonGame : TachyonGameBase
     {
-        private TachyonScreenStack ScreenStack;
+        private BackButton BackButton;
+        
+        private TachyonScreenStack screenStack;
         
         private IntroScreen introScreen;
 
@@ -49,15 +52,25 @@ namespace Tachyon.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        ScreenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
+                        screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
+                        BackButton = new BackButton
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as ITachyonScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
+                        },
                     }
                 }
             });
 
-            ScreenStack.ScreenPushed += screenPushed;
-            ScreenStack.ScreenExited += screenExited;
+            screenStack.ScreenPushed += screenPushed;
+            screenStack.ScreenExited += screenExited;
             
-            ScreenStack.Push(introScreen = new IntroScreen());
+            screenStack.Push(introScreen = new IntroScreen());
         }
         
         protected override Container CreateScalingContainer() => new ScalingContainer();
@@ -129,9 +142,9 @@ namespace Tachyon.Game
 
             if (!(newScreen is ITachyonScreen newTachyonScreen)) return;
             if (newTachyonScreen.AllowBackButton)
-            {
-                //TODO: BackButton.Show();
-            }
+                BackButton.Show();
+            else
+                BackButton.Hide();
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)

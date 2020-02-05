@@ -20,9 +20,9 @@ namespace Tachyon.Game.Graphics
 
                 case 3:
                     return new Color4(
-                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(2, 1), 16) * 17),
                         255);
 
                 case 6:
@@ -34,10 +34,10 @@ namespace Tachyon.Game.Graphics
 
                 case 4:
                     return new Color4(
-                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(3, 1), 16) * 17));
+                        (byte) (Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte) (Convert.ToByte(hex.Substring(3, 1), 16) * 17));
 
                 case 8:
                     return new Color4(
@@ -47,11 +47,13 @@ namespace Tachyon.Game.Graphics
                         Convert.ToByte(hex.Substring(6, 2), 16));
             }
         }
-        
+
         public readonly Color4 YellowLighter = FromHex(@"ffffdd");
         public readonly Color4 YellowLight = FromHex(@"ffdd55");
         public readonly Color4 Yellow = FromHex(@"ffcc22");
         public readonly Color4 YellowDark = FromHex(@"eeaa00");
         public readonly Color4 YellowDarker = FromHex(@"cc6600");
+
+        public readonly Color4 BackButtonGray = FromHex(@"313131");
     }
 }

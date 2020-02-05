@@ -70,7 +70,7 @@ namespace Tachyon.Game
             base.LoadComplete();
             
             //TODO: Change this hardcoded config when setting is implemented
-            fpsDisplayVisible = new Bindable<bool>(true);
+            fpsDisplayVisible = new Bindable<bool>();
             fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
 
