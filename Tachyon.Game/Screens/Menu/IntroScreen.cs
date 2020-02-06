@@ -10,6 +10,7 @@ using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
+using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Screens.Backgrounds;
 
 namespace Tachyon.Game.Screens.Menu
@@ -69,7 +70,7 @@ namespace Tachyon.Game.Screens.Menu
                         Padding = new MarginPadding { Horizontal = 25, Vertical = 5},
                         Children = new Drawable[]
                         {
-                            new SpriteText
+                            new TachyonSpriteText
                             {
                                 Margin = new MarginPadding
                                 {
@@ -78,7 +79,7 @@ namespace Tachyon.Game.Screens.Menu
                                 Font = TachyonFont.GetFont(Typeface.Exo, 26, FontWeight.Bold),
                                 Text = @"Tachyon",
                             },
-                            new TextFlowContainer(text => { text.Font = text.Font.With(size: 18); })
+                            new TachyonTextFlowContainer(text => { text.Font = text.Font.With(size: 18); })
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
