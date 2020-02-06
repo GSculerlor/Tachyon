@@ -16,14 +16,13 @@ namespace Tachyon.Game.Graphics.UserInterface
 
         public BackButton()
         {
-            Size = new Vector2(100, 40);
-            Margin = new MarginPadding
-            {
-                Top = 10,
-                Left = 25
-            };
+            Size = new Vector2(125, 50);
             Child = button = new IconButton
             {
+                Origin = Anchor.BottomRight,
+                Anchor = Anchor.BottomRight,
+                Height = 0.8f,
+                Width = 0.8f,
                 Icon = FontAwesome.Solid.ArrowLeft,
                 Action = () => Action?.Invoke()
             };
@@ -45,8 +44,7 @@ namespace Tachyon.Game.Graphics.UserInterface
 
         protected override void PopOut()
         {
-            // 110 is from button's width + margin (10)
-            button.MoveToX(-110, 400, Easing.OutQuint);
+            button.MoveToX(-125, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
         }
     }

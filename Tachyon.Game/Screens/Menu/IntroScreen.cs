@@ -1,4 +1,5 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
@@ -6,35 +7,46 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Screens.Backgrounds;
+using Tachyon.Game.Screens.Placeholder;
 
 namespace Tachyon.Game.Screens.Menu
 {
     public class IntroScreen : TachyonScreen
     {
         private const int start_button_height = 100;
+
+        private PlaceholderScreen mainMenu;
         
         public override bool AllowBackButton => false;
         
         public IntroScreen()
         {
             ValidForResume = false;
-            
+
             AddInternal(new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     new IntroBackgroundImage(),
-                    new StartButton()
+                    new StartButton
+                    {
+                        Action = () => this.Push(mainMenu)
+                    }
                 },
             });
+
+            Scheduler.Add(PrepareMainMenu);
         }
+
+        private void PrepareMainMenu() => LoadComponentAsync(mainMenu = new PlaceholderScreen("Main Menu"));
         
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
         
@@ -105,6 +117,7 @@ namespace Tachyon.Game.Screens.Menu
                 RelativePositionAxes = Axes.Both;
                 Position = new Vector2(0.5f, 1f);
                 Size = new Vector2(1, start_button_height);
+                Action = () => Action?.Invoke();
             }
 
             [BackgroundDependencyLoader]

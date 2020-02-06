@@ -32,7 +32,7 @@ using Tachyon.Game.Screens.Backgrounds;
             PlaceholderScreen placeholderScreen = null;
             IntroScreen introScreen = null;
 
-            AddStep("Push default background screen", () => screenStack.Push(placeholderScreen = new PlaceholderScreen()));
+            AddStep("Push default background screen", () => screenStack.Push(placeholderScreen = new PlaceholderScreen("Placeholder for screen stack")));
             AddUntilStep("Wait for current", () => placeholderScreen.IsLoaded);
             AddStep("Push intro screen", () => screenStack.Push(introScreen = new IntroScreen()));
             AddUntilStep("Wait for current", () => introScreen.IsLoaded);
