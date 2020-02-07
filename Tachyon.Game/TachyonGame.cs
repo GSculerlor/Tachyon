@@ -12,7 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using Tachyon.Game.Graphics.Containers;
-using Tachyon.Game.Graphics.UserInterface;
+using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -20,8 +20,8 @@ namespace Tachyon.Game
 {
     public class TachyonGame : TachyonGameBase
     {
-        private BackButton BackButton;
-        
+        private Toolbar toolbar;
+
         private TachyonScreenStack screenStack;
         
         private IntroScreen introScreen;
@@ -29,6 +29,8 @@ namespace Tachyon.Game
         private DependencyContainer dependencies;
         
         private FrameworkConfigManager config;
+        
+        private Container topMostOverlayContent;
         
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -53,22 +55,22 @@ namespace Tachyon.Game
                     Children = new Drawable[]
                     {
                         screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
-                        BackButton = new BackButton
-                        {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Action = () =>
-                            {
-                                if ((screenStack.CurrentScreen as ITachyonScreen)?.AllowBackButton == true)
-                                    screenStack.Exit();
-                            }
-                        },
                     }
-                }
+                },
+                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
             });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
+            
+            loadComponentSingleFile(toolbar = new Toolbar
+            {
+                Back = () =>
+                {
+                    if ((screenStack.CurrentScreen as ITachyonScreen)?.AllowBackButton == true)
+                        screenStack.Exit();
+                }
+            }, topMostOverlayContent.Add);
             
             screenStack.Push(introScreen = new IntroScreen());
         }
@@ -140,11 +142,18 @@ namespace Tachyon.Game
                 _ => introScreen
             };
 
-            if (!(newScreen is ITachyonScreen newTachyonScreen)) return;
-            if (newTachyonScreen.AllowBackButton)
-                BackButton.Show();
-            else
-                BackButton.Hide();
+            if (newScreen is ITachyonScreen newTachyonScreen)
+            {
+                if (newTachyonScreen.ToolbarVisible)
+                    toolbar.Show();
+                else
+                    toolbar.Hide();
+                
+                if (newTachyonScreen.AllowBackButton)
+                    toolbar.ToolbarBackButton?.Show();
+                else
+                    toolbar.ToolbarBackButton?.Hide();
+            }
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)

@@ -1,11 +1,7 @@
 ﻿﻿using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
-using osuTK.Graphics;
+ using osu.Framework.Graphics;
+ using osu.Framework.Testing;
  using Tachyon.Game.Screens;
-using Tachyon.Game.Screens.Backgrounds;
  using Tachyon.Game.Screens.Menu;
  using Tachyon.Game.Screens.Placeholder;
  using Tachyon.Game.Testing.Visual;

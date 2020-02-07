@@ -3,9 +3,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Screens.Backgrounds;
@@ -21,7 +19,7 @@ namespace Tachyon.Game.Screens.Placeholder
             InternalChild = new PlaceholderMessage(title);
         }
         
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        protected override BackgroundScreen CreateBackground() => new TextureBackgroundScreen();
 
         private class PlaceholderMessage : CompositeDrawable
         {

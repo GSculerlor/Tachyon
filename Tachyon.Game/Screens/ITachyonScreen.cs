@@ -1,4 +1,5 @@
 ﻿﻿using osu.Framework.Screens;
+using Tachyon.Game.Graphics.UserInterface;
 
 namespace Tachyon.Game.Screens
 {
@@ -8,6 +9,11 @@ namespace Tachyon.Game.Screens
         /// Whether the user can exit this this <see cref="ITachyonScreen"/> by pressing the back button.
         /// </summary>
         bool AllowBackButton { get; }
+        
+        /// <summary>
+        /// Whether this <see cref="ITachyonScreen"/> allows the toolbar to be displayed.
+        /// </summary>
+        bool ToolbarVisible { get; }
         
         /// <summary>
         /// Whether a top-level component should be allowed to exit the current screen to, for example,

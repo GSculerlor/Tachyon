@@ -1,4 +1,5 @@
-﻿﻿using osu.Framework.Allocation;
+﻿﻿using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -8,11 +9,15 @@ using Tachyon.Game.Graphics;
 
 namespace Tachyon.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BackgroundScreen
+    public class TextureBackgroundScreen : BackgroundScreen
     {
         private Background background;
-        
-        private static string backgroundName => @"Characters/Exusiai_1";
+        private readonly string backgroundName;
+
+        public TextureBackgroundScreen([CanBeNull] string backgroundName = @"Characters/Exusiai_1")
+        {
+            this.backgroundName = backgroundName;
+        }
 
         [BackgroundDependencyLoader]
         private void load()

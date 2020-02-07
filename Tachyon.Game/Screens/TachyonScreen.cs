@@ -8,6 +8,8 @@ using osu.Framework.Screens;
     {
         public virtual bool AllowBackButton => true;
         
+        public virtual bool ToolbarVisible => true;
+        
         public bool AllowExternalScreenChange => false;
 
         public bool CursorVisible => true;
