@@ -9,7 +9,7 @@ using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
-using Tachyon.Game.Overlays.Toolbar;
+using Tachyon.Game.Overlays;
 
 namespace Tachyon.Game.Graphics.UserInterface
 {

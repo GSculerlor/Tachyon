@@ -11,8 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using Tachyon.Game.Components;
 using Tachyon.Game.Graphics.Containers;
-using Tachyon.Game.Overlays.Toolbar;
+using Tachyon.Game.Overlays;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -30,7 +31,9 @@ namespace Tachyon.Game
         
         private FrameworkConfigManager config;
         
-        private Container topMostOverlayContent;
+        private Container bottomMostOverlayContent;
+
+        private MusicController musicController;
         
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -57,7 +60,7 @@ namespace Tachyon.Game
                         screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                bottomMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
             });
 
             screenStack.ScreenPushed += screenPushed;
@@ -70,7 +73,9 @@ namespace Tachyon.Game
                     if ((screenStack.CurrentScreen as ITachyonScreen)?.AllowBackButton == true)
                         screenStack.Exit();
                 }
-            }, topMostOverlayContent.Add);
+            }, bottomMostOverlayContent.Add);
+
+            loadComponentSingleFile(musicController = new MusicController(), Add, true);
             
             screenStack.Push(introScreen = new IntroScreen());
         }

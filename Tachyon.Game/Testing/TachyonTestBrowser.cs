@@ -4,7 +4,10 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using Tachyon.Game.Graphics;
+using Tachyon.Game.Screens.Backgrounds;
 
 namespace Tachyon.Game.Testing
 {
@@ -14,6 +17,12 @@ namespace Tachyon.Game.Testing
         {
             base.LoadComplete();
 
+            LoadComponentAsync(new ScreenStack(new TextureBackgroundScreen { Colour = TachyonColor.Gray(0.5f) })
+            {
+                Depth = 10,
+                RelativeSizeAxes = Axes.Both,
+            }, AddInternal);
+            
             AddRange(new Drawable[]
             {
                 new TestBrowser("Tachyon"),

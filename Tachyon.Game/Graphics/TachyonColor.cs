@@ -48,6 +48,23 @@ namespace Tachyon.Game.Graphics
             }
         }
 
+        public readonly Color4 Gray0 = FromHex(@"000");
+        public readonly Color4 Gray1 = FromHex(@"111");
+        public readonly Color4 Gray2 = FromHex(@"222");
+        public readonly Color4 Gray3 = FromHex(@"333");
+        public readonly Color4 Gray4 = FromHex(@"444");
+        public readonly Color4 Gray5 = FromHex(@"555");
+        public readonly Color4 Gray6 = FromHex(@"666");
+        public readonly Color4 Gray7 = FromHex(@"777");
+        public readonly Color4 Gray8 = FromHex(@"888");
+        public readonly Color4 Gray9 = FromHex(@"999");
+        public readonly Color4 GrayA = FromHex(@"aaa");
+        public readonly Color4 GrayB = FromHex(@"bbb");
+        public readonly Color4 GrayC = FromHex(@"ccc");
+        public readonly Color4 GrayD = FromHex(@"ddd");
+        public readonly Color4 GrayE = FromHex(@"eee");
+        public readonly Color4 GrayF = FromHex(@"fff");
+        
         public readonly Color4 YellowLighter = FromHex(@"ffffdd");
         public readonly Color4 YellowLight = FromHex(@"ffdd55");
         public readonly Color4 Yellow = FromHex(@"ffcc22");
