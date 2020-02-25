@@ -41,7 +41,7 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.203.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.225.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tachyon.Game\Tachyon.Game.csproj">
