@@ -89,10 +89,10 @@ namespace Tachyon.Game.Screens.Menu
                                 {
                                     Bottom = 5,
                                 },
-                                Font = TachyonFont.GetFont(Typeface.Exo, 26, FontWeight.Bold),
+                                Font = TachyonFont.GetFont(Typeface.Quicksand, 40, FontWeight.Bold),
                                 Text = @"Tachyon",
                             },
-                            new TachyonTextFlowContainer(text => { text.Font = text.Font.With(size: 18); })
+                            new TachyonTextFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,

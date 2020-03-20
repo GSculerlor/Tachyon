@@ -7,14 +7,14 @@ namespace Tachyon.Game.Graphics
         /// <summary>
         /// The default font size.
         /// </summary>
-        public const float DEFAULT_FONT_SIZE = 16;
+        public const float DEFAULT_FONT_SIZE = 24;
 
         /// <summary>
         /// The default font.
         /// </summary>
         public static FontUsage Default => GetFont();
 
-        public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Regular);
+        public static FontUsage Numeric => GetFont(Typeface.Venera);
 
         /// <summary>
         /// Retrieves a <see cref="FontUsage"/>.
@@ -25,8 +25,8 @@ namespace Tachyon.Game.Graphics
         /// <param name="italics">Whether the font is italic.</param>
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
-        public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), italics, fixedWidth);
+        public static FontUsage GetFont(Typeface typeface = Typeface.Quicksand, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Regular, bool italics = false, bool fixedWidth = false)
+            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(weight), italics, fixedWidth);
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="Typeface"/>.
@@ -37,8 +37,8 @@ namespace Tachyon.Game.Graphics
         {
             switch (typeface)
             {
-                case Typeface.Exo:
-                    return "Exo2.0";
+                case Typeface.Quicksand:
+                    return "Quicksand";
 
                 case Typeface.Venera:
                     return "Venera";
@@ -50,28 +50,10 @@ namespace Tachyon.Game.Graphics
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
         /// </summary>
-        /// <param name="typeface">The <see cref="Typeface"/>.</param>
         /// <param name="weight">The <see cref="FontWeight"/>.</param>
-        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="typeface"/>.</returns>
-        public static string GetWeightString(Typeface typeface, FontWeight weight)
-            => GetWeightString(GetFamilyString(typeface), weight);
-
-        /// <summary>
-        /// Retrieves the string representation of a <see cref="FontWeight"/>.
-        /// </summary>
-        /// <param name="family">The family string.</param>
-        /// <param name="weight">The <see cref="FontWeight"/>.</param>
-        /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
-        public static string GetWeightString(string family, FontWeight weight)
-        {
-            string weightString = weight.ToString();
-
-            // Only exo has an explicit "regular" weight, other fonts do not
-            if (family != GetFamilyString(Typeface.Exo) && weight == FontWeight.Regular)
-                weightString = string.Empty;
-
-            return weightString;
-        }
+        /// <returns>The string representation of <paramref name="weight"/>.</returns>
+        public static string GetWeightString(FontWeight weight)
+            => weight.ToString();
     }
 
     public static class TachyonFontExtensions
@@ -89,7 +71,7 @@ namespace Tachyon.Game.Graphics
         public static FontUsage With(this FontUsage usage, Typeface? typeface = null, float? size = null, FontWeight? weight = null, bool? italics = null, bool? fixedWidth = null)
         {
             string familyString = typeface != null ? TachyonFont.GetFamilyString(typeface.Value) : usage.Family;
-            string weightString = weight != null ? TachyonFont.GetWeightString(familyString, weight.Value) : usage.Weight;
+            string weightString = weight != null ? TachyonFont.GetWeightString(weight.Value) : usage.Weight;
 
             return usage.With(familyString, size, weightString, italics, fixedWidth);
         }
@@ -97,17 +79,15 @@ namespace Tachyon.Game.Graphics
 
     public enum Typeface
     {
-        Exo,
         Venera,
+        Quicksand
     }
 
     public enum FontWeight
     {
         Light,
         Regular,
-        Medium,
         SemiBold,
-        Bold,
-        Black
+        Bold
     }
 }
