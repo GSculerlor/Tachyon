@@ -2,7 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Tachyon.Game.Testing.Visual
+namespace Tachyon.Game.Tests.Visual
 {
     public abstract class TachyonGridTestScene : TachyonTestScene
     {

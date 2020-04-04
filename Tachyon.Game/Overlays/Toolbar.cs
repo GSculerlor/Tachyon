@@ -27,8 +27,6 @@ namespace Tachyon.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
             Size = new Vector2(1, HEIGHT);
-            Margin = new MarginPadding { Bottom = 20 };
-            Padding = new MarginPadding { Horizontal = 20 };
         }
 
         [BackgroundDependencyLoader(true)]

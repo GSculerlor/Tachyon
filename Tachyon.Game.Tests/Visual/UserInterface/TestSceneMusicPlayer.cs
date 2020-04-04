@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using Tachyon.Game.Components;
 using Tachyon.Game.Overlays;
-using Tachyon.Game.Testing.Visual;
 
 namespace Tachyon.Game.Tests.Visual.UserInterface
 {

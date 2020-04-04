@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
@@ -9,7 +6,7 @@ using osu.Framework.Testing;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Screens.Backgrounds;
 
-namespace Tachyon.Game.Testing
+namespace Tachyon.Game.Tests
 {
     public class TachyonTestBrowser : TachyonGameBase
     {

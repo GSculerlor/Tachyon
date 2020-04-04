@@ -1,32 +1,53 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
+using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Configuration;
+using Tachyon.Game.Database;
 using Tachyon.Game.Graphics;
 
 namespace Tachyon.Game
 {
-    public class TachyonGameBase : osu.Framework.Game
+    public class TachyonGameBase : osu.Framework.Game, ICanAcceptFiles
     {
         private DependencyContainer dependencies;
 
         private TachyonConfigManager LocalConfig;
+        
+        protected BeatmapManager BeatmapManager;
 
         private Bindable<bool> fpsDisplayVisible;
 
         private Storage Storage { get; set; }
         
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        
+        public TachyonGameBase()
+        {
+            Name = @"Tachyon";
+        }
+        
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        private DatabaseContextFactory contextFactory;
+        
         [BackgroundDependencyLoader]
         private void load()
         {
             Resources.AddStore(new DllResourceStore(@"Tachyon.Resources.dll"));
+            
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
             
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
@@ -53,8 +74,26 @@ namespace Tachyon.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Medium");
             
+            runMigrations();
+            
+            var defaultBeatmap = new PlaceholderWorkingBeatmap(Audio, Textures);
+            
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, Audio, Host, defaultBeatmap));
             dependencies.Cache(new TachyonColor());
             
+            fileImporters.Add(BeatmapManager);
+            
+            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            
+            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
+            {
+                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
+                    b.OldValue.RecycleTrack();
+            }));
+            
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
+            dependencies.CacheAs(Beatmap);
+
             base.Content.Add(CreateScalingContainer());
         }
         
@@ -81,6 +120,41 @@ namespace Tachyon.Game
 
             if (LocalConfig == null)
                 LocalConfig = new TachyonConfigManager(Storage);
+        }
+
+        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
+        
+        public async Task Import(params string[] paths)
+        {
+            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
+
+            foreach (var importer in fileImporters)
+            {
+                if (importer.HandledExtensions.Contains(extension))
+                    await importer.Import(paths);
+            }
+        }
+        
+        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+        
+        private void runMigrations()
+        {
+            try
+            {
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
+
+                contextFactory.ResetDatabase();
+
+                Logger.Log("Database purged successfully.", LoggingTarget.Database);
+
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
         }
     }
 }

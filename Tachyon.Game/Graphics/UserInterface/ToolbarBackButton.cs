@@ -9,7 +9,7 @@ namespace Tachyon.Game.Graphics.UserInterface
         {
             AutoSizeAxes = Axes.X;
 
-            Icon = FontAwesome.Solid.ArrowLeft;
+            Icon = FontAwesome.Solid.ChevronLeft;
             Text = @"Back";
         }
     }

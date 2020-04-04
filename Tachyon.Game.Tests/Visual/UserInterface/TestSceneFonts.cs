@@ -3,7 +3,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
-using Tachyon.Game.Testing.Visual;
 
 namespace Tachyon.Game.Tests.Visual.UserInterface
 {

@@ -4,7 +4,6 @@
  using Tachyon.Game.Screens;
  using Tachyon.Game.Screens.Menu;
  using Tachyon.Game.Screens.Placeholder;
- using Tachyon.Game.Testing.Visual;
 
  namespace Tachyon.Game.Tests.Visual.Screens
 {
