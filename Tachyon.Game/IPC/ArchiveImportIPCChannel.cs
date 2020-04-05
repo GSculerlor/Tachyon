@@ -29,7 +29,6 @@ namespace Tachyon.Game.IPC
         {
             if (importer == null)
             {
-                //we want to contact a remote osu! to handle the import.
                 await SendMessageAsync(new ArchiveImportMessage { Path = path });
                 return;
             }

@@ -70,7 +70,7 @@ namespace Tachyon.Game.Migrations
                     DateAdded = table.Column<DateTimeOffset>(nullable: false),
                     MetadataID = table.Column<int>(nullable: true),
                     Hash = table.Column<string>(nullable: true),
-                    Protected = table.Column<bool>(nullable: false)
+                    DeletePending = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,6 +195,11 @@ namespace Tachyon.Game.Migrations
                 name: "IX_BeatmapSetFileInfo_FileInfoID",
                 table: "BeatmapSetFileInfo",
                 column: "FileInfoID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BeatmapSetInfo_DeletePending",
+                table: "BeatmapSetInfo",
+                column: "DeletePending");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BeatmapSetInfo_Hash",

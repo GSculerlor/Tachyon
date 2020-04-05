@@ -7,7 +7,7 @@ using osu.Framework.Platform;
 namespace Tachyon.Game.Database
 {
     public abstract class MutableDatabaseBackedStore<T> : DatabaseBackedStore
-        where T : class, IHasPrimaryKey
+        where T : class, IHasPrimaryKey, ISoftDelete
     {
         public event Action<T> ItemAdded;
         public event Action<T> ItemRemoved;
@@ -44,6 +44,10 @@ namespace Tachyon.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 Refresh(ref item);
+                
+                if (item.DeletePending) return false;
+
+                item.DeletePending = true;
             }
 
             ItemRemoved?.Invoke(item);
@@ -55,6 +59,10 @@ namespace Tachyon.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 Refresh(ref item, ConsumableItems);
+                
+                if (!item.DeletePending) return false;
+
+                item.DeletePending = false;
             }
 
             ItemAdded?.Invoke(item);
@@ -79,7 +87,7 @@ namespace Tachyon.Game.Database
             {
                 var context = usage.Context;
 
-                var lookup = (IQueryable<T>) context.Set<T>();
+                var lookup = context.Set<T>().Where(s => s.DeletePending);
 
                 if (query != null) lookup = lookup.Where(query);
 

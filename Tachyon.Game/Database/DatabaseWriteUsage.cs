@@ -19,10 +19,6 @@ namespace Tachyon.Game.Database
         private bool isDisposed;
         public List<Exception> Errors = new List<Exception>();
 
-        /// <summary>
-        /// Whether this write usage will commit a transaction on completion.
-        /// If false, there is a parent usage responsible for transaction commit.
-        /// </summary>
         public bool IsTransactionLeader = false;
 
         protected void Dispose(bool disposing)

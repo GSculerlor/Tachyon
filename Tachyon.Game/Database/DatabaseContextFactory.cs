@@ -10,7 +10,7 @@ namespace Tachyon.Game.Database
     {
         private readonly Storage storage;
 
-        private const string database_name = @"tachyon-client";
+        private const string database_name = @"tachyon_client";
 
         private ThreadLocal<TachyonDbContext> threadContexts;
 
@@ -34,22 +34,12 @@ namespace Tachyon.Game.Database
         private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Database", "Commits");
         private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Database", "Rollbacks");
 
-        /// <summary>
-        /// Get a context for the current thread for read-only usage.
-        /// If a <see cref="DatabaseWriteUsage"/> is in progress, the existing write-safe context will be returned.
-        /// </summary>
         public TachyonDbContext Get()
         {
             reads.Value++;
             return threadContexts.Value;
         }
 
-        /// <summary>
-        /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
-        /// This method may block if a write is already active on a different thread.
-        /// </summary>
-        /// <param name="withTransaction">Whether to start a transaction for this write.</param>
-        /// <returns>A usage containing a usable context.</returns>
         public DatabaseWriteUsage GetForWrite(bool withTransaction = true)
         {
             writes.Value++;
@@ -60,8 +50,6 @@ namespace Tachyon.Game.Database
             {
                 if (currentWriteTransaction == null && withTransaction)
                 {
-                    // this mitigates the fact that changes on tracked entities will not be rolled back with the transaction by ensuring write operations are always executed in isolated contexts.
-                    // if this results in sub-optimal efficiency, we may need to look into removing Database-level transactions in favour of running SaveChanges where we currently commit the transaction.
                     if (threadContexts.IsValueCreated)
                         recycleThreadContexts();
 
@@ -70,13 +58,11 @@ namespace Tachyon.Game.Database
                 }
                 else
                 {
-                    // we want to try-catch the retrieval of the context because it could throw an error (in CreateContext).
                     context = threadContexts.Value;
                 }
             }
             catch
             {
-                // retrieval of a context could trigger a fatal error.
                 Monitor.Exit(writeLock);
                 throw;
             }
@@ -110,10 +96,8 @@ namespace Tachyon.Game.Database
 
                     if (currentWriteDidWrite || currentWriteDidError)
                     {
-                        // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
                         usage.Context.Dispose();
 
-                        // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
                         recycleThreadContexts();
                     }
 
@@ -130,8 +114,6 @@ namespace Tachyon.Game.Database
 
         private void recycleThreadContexts()
         {
-            // Contexts for other threads are not disposed as they may be in use elsewhere. Instead, fresh contexts are exposed
-            // for other threads to use, and we rely on the finalizer inside TachyonDbContext to handle their previous contexts
             threadContexts?.Value.Dispose();
             threadContexts = new ThreadLocal<TachyonDbContext>(CreateContext, true);
         }

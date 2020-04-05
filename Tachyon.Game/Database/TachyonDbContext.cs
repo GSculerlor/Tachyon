@@ -33,9 +33,6 @@ namespace Tachyon.Game.Database
             SQLitePCL.raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
         }
 
-        /// <summary>
-        /// Create a new in-memory TachyonDbContext instance.
-        /// </summary>
         public TachyonDbContext()
             : this("DataSource=:memory:")
         {
@@ -44,10 +41,6 @@ namespace Tachyon.Game.Database
             Migrate();
         }
 
-        /// <summary>
-        /// Create a new TachyonDbContext instance.
-        /// </summary>
-        /// <param name="connectionString">A valid SQLite connection string.</param>
         public TachyonDbContext(string connectionString)
         {
             this.connectionString = connectionString;
@@ -98,8 +91,6 @@ namespace Tachyon.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                // this is required for the time being due to the way we are querying in places like BeatmapStore.
-                // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
                 .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
                 .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
@@ -113,7 +104,8 @@ namespace Tachyon.Game.Database
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();

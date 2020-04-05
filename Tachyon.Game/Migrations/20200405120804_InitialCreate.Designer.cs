@@ -9,7 +9,7 @@ using Tachyon.Game.Database;
 namespace Tachyon.Game.Migrations
 {
     [DbContext(typeof(TachyonDbContext))]
-    [Migration("20200404104135_InitialCreate")]
+    [Migration("20200405120804_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,15 +149,17 @@ namespace Tachyon.Game.Migrations
 
                     b.Property<DateTimeOffset>("DateAdded");
 
+                    b.Property<bool>("DeletePending");
+
                     b.Property<string>("Hash");
 
                     b.Property<int?>("MetadataID");
 
                     b.Property<int?>("OnlineBeatmapSetID");
 
-                    b.Property<bool>("Protected");
-
                     b.HasKey("ID");
+
+                    b.HasIndex("DeletePending");
 
                     b.HasIndex("Hash")
                         .IsUnique();

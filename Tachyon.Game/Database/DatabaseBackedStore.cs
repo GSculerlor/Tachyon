@@ -10,12 +10,6 @@ namespace Tachyon.Game.Database
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
-        /// <summary>
-        /// Refresh an instance potentially from a different thread with a local context-tracked instance.
-        /// </summary>
-        /// <param name="obj">The object to use as a reference when negotiating a local instance.</param>
-        /// <param name="lookupSource">An optional lookup source which will be used to query and populate a freshly retrieved replacement. If not provided, the refreshed object will still be returned but will not have any includes.</param>
-        /// <typeparam name="T">A valid EF-stored type.</typeparam>
         protected virtual void Refresh<T>(ref T obj, IQueryable<T> lookupSource = null) where T : class, IHasPrimaryKey
         {
             using (var usage = ContextFactory.GetForWrite())
@@ -39,9 +33,6 @@ namespace Tachyon.Game.Database
             Storage = storage;
         }
 
-        /// <summary>
-        /// Perform any common clean-up tasks. Should be run when idle, or whenever necessary.
-        /// </summary>
         public virtual void Cleanup()
         {
         }

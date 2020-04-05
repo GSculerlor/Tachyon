@@ -6,7 +6,7 @@ using Tachyon.Game.Database;
 
 namespace Tachyon.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, IEquatable<BeatmapSetInfo>
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
     {
         public int ID { get; set; }
         
@@ -30,13 +30,14 @@ namespace Tachyon.Game.Beatmaps
 
         public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
 
+        [NotMapped]
+        public bool DeletePending { get; set; }
+        
         public string Hash { get; set; }
         
         public List<BeatmapSetFileInfo> Files { get; set; }
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
-
-        public bool Protected { get; set; }
 
         public bool Equals(BeatmapSetInfo other)
         {

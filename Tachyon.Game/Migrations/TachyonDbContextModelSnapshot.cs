@@ -147,15 +147,17 @@ namespace Tachyon.Game.Migrations
 
                     b.Property<DateTimeOffset>("DateAdded");
 
+                    b.Property<bool>("DeletePending");
+
                     b.Property<string>("Hash");
 
                     b.Property<int?>("MetadataID");
 
                     b.Property<int?>("OnlineBeatmapSetID");
 
-                    b.Property<bool>("Protected");
-
                     b.HasKey("ID");
+
+                    b.HasIndex("DeletePending");
 
                     b.HasIndex("Hash")
                         .IsUnique();
