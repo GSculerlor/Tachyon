@@ -23,7 +23,14 @@ namespace Tachyon.Desktop
                 desktopWindow.FileDrop += fileDrop;
             }
         }
-        
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            
+            LoadComponentAsync(new DiscordRichPresence(), Add);
+        }
+
         private void fileDrop(object sender, FileDropEventArgs e)
         {
             var filePaths = e.FileNames;
