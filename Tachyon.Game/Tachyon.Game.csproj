@@ -6,7 +6,7 @@
     <PackageReference Include="Humanizer" Version="2.7.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
-    <PackageReference Include="ppy.osu.Framework" Version="2020.319.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2020.407.1" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0-preview.1.20120.5" />
   </ItemGroup>
