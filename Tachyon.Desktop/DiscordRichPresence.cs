@@ -1,8 +1,10 @@
 ﻿using DiscordRPC;
 using DiscordRPC.Message;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using Tachyon.Game.Beatmaps;
 
 namespace Tachyon.Desktop
 {
@@ -16,6 +18,9 @@ namespace Tachyon.Desktop
         {
             Assets = new Assets { LargeImageKey = "tachyon_grani", }
         };
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
         
         [BackgroundDependencyLoader]
         private void load()
@@ -28,6 +33,8 @@ namespace Tachyon.Desktop
             client.OnReady += onReady;
             client.OnConnectionFailed += (_, __) => client.Deinitialize();
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
+            
+            beatmap.BindValueChanged(_ => updateStatus());
             
             client.Initialize();
         }
@@ -43,8 +50,16 @@ namespace Tachyon.Desktop
             if (!client.IsInitialized)
                 return;
 
-            presence.State = "Developing...";
-            presence.Details = "Working on import and storing beatmaps";
+            if (beatmap.IsDefault)
+            {
+                presence.Details = "Doing nothing, probably code something";
+            }
+            else
+            {
+                presence.Details = $"Listening to {beatmap.Value.Metadata.Title} by {beatmap.Value.Metadata.Artist}";
+            }
+            
+            presence.State = "Under development";
 
             client.SetPresence(presence);
         }
