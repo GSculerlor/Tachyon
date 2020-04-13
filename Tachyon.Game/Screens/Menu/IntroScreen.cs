@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Graphics.Backgrounds;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Screens.Backgrounds;
@@ -21,7 +22,7 @@ namespace Tachyon.Game.Screens.Menu
     {
         private const int start_button_height = 100;
 
-        private PlaceholderScreen mainMenu;
+        private MainMenu mainMenu;
 
         public override bool AllowBackButton => false;
 
@@ -47,9 +48,9 @@ namespace Tachyon.Game.Screens.Menu
             Scheduler.Add(PrepareMainMenu);
         }
 
-        private void PrepareMainMenu() => LoadComponentAsync(mainMenu = new PlaceholderScreen("Main Menu"));
+        private void PrepareMainMenu() => LoadComponentAsync(mainMenu = new MainMenu());
         
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+        protected override BackgroundScreen CreateBackground() => new BlackScreen();
         
         private class IntroBackgroundImage : Background
         {

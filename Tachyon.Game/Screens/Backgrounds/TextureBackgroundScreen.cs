@@ -6,8 +6,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
+ using Tachyon.Game.Graphics.Backgrounds;
 
-namespace Tachyon.Game.Screens.Backgrounds
+ namespace Tachyon.Game.Screens.Backgrounds
 {
     public class TextureBackgroundScreen : BackgroundScreen
     {

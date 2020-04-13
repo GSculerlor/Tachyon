@@ -3,7 +3,7 @@ using Tachyon.Game.GameModes.Scoring;
 
 namespace Tachyon.Game.GameModes.Objects.Converters
 {
-    internal abstract class ConvertHitObject : HitObject
+    public abstract class ConvertHitObject : HitObject
     {
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 

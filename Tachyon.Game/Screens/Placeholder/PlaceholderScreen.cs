@@ -13,20 +13,23 @@ namespace Tachyon.Game.Screens.Placeholder
     public class PlaceholderScreen : TachyonScreen
     {
         private const double transition_time = 1000;
+        private readonly bool transparentBackground;
 
-        public PlaceholderScreen(string title)
+        public PlaceholderScreen(string title, bool transparentBackground = false)
         {
+            this.transparentBackground = transparentBackground;
+            
             InternalChild = new PlaceholderMessage(title);
         }
         
-        protected override BackgroundScreen CreateBackground() => new TextureBackgroundScreen();
+        protected override BackgroundScreen CreateBackground() => transparentBackground ? (BackgroundScreen) new TransparentScreen() : new TextureBackgroundScreen();
 
         private class PlaceholderMessage : CompositeDrawable
         {
             private readonly Container boxContainer;
             private readonly Box box;
 
-            public PlaceholderMessage(string message)
+            public PlaceholderMessage(string screenName)
             {
                 RelativeSizeAxes = Axes.Both;
                 Size = new Vector2(0.5f, 0.2f);
@@ -48,7 +51,7 @@ namespace Tachyon.Game.Screens.Placeholder
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0.2f,
-                                Blending = BlendingParameters.Mixture,
+                                Blending = BlendingParameters.Additive,
                             },
                             new FillFlowContainer
                             {
@@ -62,14 +65,14 @@ namespace Tachyon.Game.Screens.Placeholder
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = message,
-                                        Font = TachyonFont.GetFont(size: 26),
+                                        Text = $"Should be {screenName} here",
+                                        Font = TachyonFont.GetFont(size: 26, weight: FontWeight.Bold),
                                     },
                                     new TachyonSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "This feature isn't ready yet. Please come back soon!",
+                                        Text = "Still under development! Please wait...",
                                         Font = TachyonFont.GetFont(size: 18),
                                     },
                                 }
@@ -82,7 +85,7 @@ namespace Tachyon.Game.Screens.Placeholder
             [BackgroundDependencyLoader]
             private void load(TachyonColor color)
             {
-                box.Colour = color.YellowDarker.Opacity(0.9f);
+                box.Colour = color.RedSomething.Opacity(0.75f);
             }
 
             protected override void LoadComplete()

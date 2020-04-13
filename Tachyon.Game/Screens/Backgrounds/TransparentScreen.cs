@@ -5,13 +5,13 @@ using osuTK.Graphics;
 
 namespace Tachyon.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBlack : BackgroundScreen
+    public class TransparentScreen : BackgroundScreen
     {
-        public BackgroundScreenBlack()
+        public TransparentScreen()
         {
             InternalChild = new Box
             {
-                Colour = Color4.Black,
+                Colour = Color4.Transparent,
                 RelativeSizeAxes = Axes.Both,
             };
         }

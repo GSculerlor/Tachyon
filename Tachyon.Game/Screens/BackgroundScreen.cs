@@ -22,5 +22,22 @@ namespace Tachyon.Game.Screens
         {
             return other?.GetType() == GetType();
         }
+        
+        public override void OnEntering(IScreen last)
+        {
+            this.FadeOut();
+
+            this.FadeIn(400, Easing.OutQuint);
+            
+            base.OnEntering(last);
+        }
+
+
+        public override bool OnExiting(IScreen next)
+        {
+            this.FadeOut(400, Easing.OutQuint);
+
+            return base.OnExiting(next);
+        }
     }
 }
