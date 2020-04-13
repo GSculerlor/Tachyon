@@ -1,16 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Overlays;
+using Tachyon.Game.Overlays.Music;
+using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -18,19 +24,21 @@ namespace Tachyon.Game
 {
     public class TachyonGame : TachyonGameBase
     {
-        private Toolbar toolbar;
+        public Toolbar Toolbar;
 
         private TachyonScreenStack screenStack;
-        
         private IntroScreen introScreen;
-
         private DependencyContainer dependencies;
-        
-        private FrameworkConfigManager config;
-        
+        private Container rightFloatingOverlayContent;
+        private Container leftFloatingOverlayContent;
         private Container bottomMostOverlayContent;
-
+        private Container overlayContainer;
         private MusicController musicController;
+        private ScalingContainer screenContainer;
+        
+        public float ToolbarOffset => Toolbar.DrawHeight + 10;
+        
+        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
         
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -38,9 +46,14 @@ namespace Tachyon.Game
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
-            config = frameworkConfig;
-            
+            if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
+            {
+                Logger.Log(@"Can't run multiple instances.", LoggingTarget.Runtime, LogLevel.Error);
+                Environment.Exit(0);
+            }
+
             dependencies.CacheAs(this);
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         protected override void LoadComplete()
@@ -49,7 +62,7 @@ namespace Tachyon.Game
 
             AddRange(new Drawable[]
             {
-                new ScalingContainer
+                screenContainer = new ScalingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -57,47 +70,58 @@ namespace Tachyon.Game
                         screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
                     }
                 },
+                overlayContainer = new Container { RelativeSizeAxes = Axes.Both },
                 bottomMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
             });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
             
-            loadComponentSingleFile(toolbar = new Toolbar
-            {
-                Back = () =>
-                {
-                    if ((screenStack.CurrentScreen as ITachyonScreen)?.AllowBackButton == true)
-                        screenStack.Exit();
-                }
-            }, bottomMostOverlayContent.Add);
+            screenStack.Push(createLoader().With(l => l.RelativeSizeAxes = Axes.Both));
+            
+            loadComponentSingleFile(Toolbar = new Toolbar(), bottomMostOverlayContent.Add);
 
             loadComponentSingleFile(musicController = new MusicController(), Add, true);
             
-            screenStack.Push(introScreen = new IntroScreen());
+            loadComponentSingleFile(new MusicPlayerOverlay
+            {
+                Margin = new MarginPadding
+                {
+                    Top = ToolbarOffset,
+                    Right = 10
+                },
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }, rightFloatingOverlayContent.Add, true);
+            
+            Screen.BindTo(Toolbar.Screen);
         }
         
+        [Cached]
+        [Cached(typeof(IBindable<Toolbar.MenuScreen>))]
+        protected readonly Bindable<Toolbar.MenuScreen> Screen = new Bindable<Toolbar.MenuScreen>();
+        
         protected override Container CreateScalingContainer() => new ScalingContainer();
+
+        private LoaderScreen createLoader() => new LoaderScreen();
         
         private Task asyncLoadStream;
         
-        private T loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
+        private void loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
             where T : Drawable
         {
             if (cache)
                 dependencies.Cache(d);
 
-            /*if (d is OverlayContainer overlay)
-                overlays.Add(overlay);*/
+            if (d is OverlayContainer overlay)
+                overlays.Add(overlay);
 
-            // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
-            // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
-            // we could avoid the need for scheduling altogether.
             Schedule(() =>
             {
                 var previousLoadStream = asyncLoadStream;
 
-                //chain with existing load stream
                 asyncLoadStream = Task.Run(async () =>
                 {
                     if (previousLoadStream != null)
@@ -107,17 +131,13 @@ namespace Tachyon.Game
                     {
                         Logger.Log($"Loading {d}...", level: LogLevel.Debug);
 
-                        // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
-                        // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
                         Task task = null;
                         var del = new ScheduledDelegate(() => task = LoadComponentAsync(d, add));
                         Scheduler.Add(del);
 
-                        // The delegate won't complete if OsuGame has been disposed in the meantime
                         while (!IsDisposed && !del.Completed)
                             await Task.Delay(10);
 
-                        // Either we're disposed or the load process has started successfully
                         if (IsDisposed)
                             return;
 
@@ -132,41 +152,87 @@ namespace Tachyon.Game
                     }
                 });
             });
-
-            return d;
         }
         
-        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            introScreen = newScreen switch
+            beatmap.OldValue?.CancelAsyncLoad();
+
+            var newBeatmap = beatmap.NewValue;
+
+            if (newBeatmap != null)
             {
-                IntroScreen intro => intro,
-                _ => introScreen
-            };
+                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
+                newBeatmap.BeginAsyncLoad();
+            }
+
+            void trackCompleted(WorkingBeatmap b)
+            {
+                if (Beatmap.Value != b)
+                    return;
+
+                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                    musicController.NextTrack();
+            }
+        }
+        
+        protected override bool OnExiting()
+        {
+            if (screenStack.CurrentScreen is LoaderScreen)
+                return false;
+
+            if (introScreen == null)
+                return true;
+
+            if (!(screenStack.CurrentScreen is IntroScreen))
+            {
+                Scheduler.Add(introScreen.MakeCurrent);
+                return true;
+            }
+
+            return base.OnExiting();
+        }
+        
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            overlayContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        private void screenChanged(IScreen current, IScreen newScreen)
+        {
+            switch (newScreen)
+            {
+                case IntroScreen intro:
+                    introScreen = intro;
+                    break;
+            }
 
             if (newScreen is ITachyonScreen newTachyonScreen)
             {
                 if (newTachyonScreen.ToolbarVisible)
-                    toolbar.Show();
+                    Toolbar?.Show();
                 else
-                    toolbar.Hide();
+                    Toolbar?.Hide();
                 
-                if (newTachyonScreen.AllowBackButton)
-                    toolbar.ToolbarBackButton?.Show();
+                /*if (newTachyonScreen.AllowBackButton)
+                    Toolbar?.ToolbarBackButton?.Show();
                 else
-                    toolbar.ToolbarBackButton?.Hide();
+                    Toolbar?.ToolbarBackButton?.Hide();*/
             }
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)
         {
-            ScreenChanged(lastScreen, newScreen);
+            screenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed → {newScreen}");
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            ScreenChanged(lastScreen, newScreen);
+            screenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed ← {newScreen}");
 
             if (newScreen == null)

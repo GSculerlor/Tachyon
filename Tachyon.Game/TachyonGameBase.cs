@@ -15,15 +15,16 @@ using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Configuration;
 using Tachyon.Game.Database;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.IO;
 
 namespace Tachyon.Game
 {
     public class TachyonGameBase : osu.Framework.Game, ICanAcceptFiles
     {
         private DependencyContainer dependencies;
-
         private TachyonConfigManager LocalConfig;
         
+        protected FileStore FileStore;
         protected BeatmapManager BeatmapManager;
 
         private Bindable<bool> fpsDisplayVisible;
@@ -76,6 +77,8 @@ namespace Tachyon.Game
             
             runMigrations();
             
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
+            
             var defaultBeatmap = new PlaceholderWorkingBeatmap(Audio, Textures);
             
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, Audio, Host, defaultBeatmap));
@@ -93,6 +96,8 @@ namespace Tachyon.Game
             
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
+            
+            FileStore.Cleanup();
 
             base.Content.Add(CreateScalingContainer());
         }
