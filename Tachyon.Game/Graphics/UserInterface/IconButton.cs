@@ -8,7 +8,7 @@ namespace Tachyon.Game.Graphics.UserInterface
 {
     public class IconButton : AnimatedButton
     {
-        public const float DEFAULT_BUTTON_SIZE = 30;
+        public const float DEFAULT_BUTTON_SIZE = 24;
         
         private Color4? iconColor;
 

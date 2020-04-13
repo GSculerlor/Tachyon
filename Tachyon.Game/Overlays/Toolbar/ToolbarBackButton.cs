@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 
-namespace Tachyon.Game.Graphics.UserInterface
+namespace Tachyon.Game.Overlays.Toolbar
 {
     public class ToolbarBackButton : ToolbarButton
     {

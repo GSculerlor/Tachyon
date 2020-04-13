@@ -7,11 +7,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Graphics;
+using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
-using Tachyon.Game.Overlays;
 
-namespace Tachyon.Game.Graphics.UserInterface
+namespace Tachyon.Game.Overlays.Toolbar
 {
     public class ToolbarButton : ClickableContainer
     {

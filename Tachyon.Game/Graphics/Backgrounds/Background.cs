@@ -1,14 +1,15 @@
-﻿﻿using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
-namespace Tachyon.Game.Graphics
+namespace Tachyon.Game.Graphics.Backgrounds
 {
     public class Background : CompositeDrawable
     {
-        private readonly Sprite Sprite;
+        protected readonly Sprite Sprite;
+        
         private readonly string textureName;
 
         public Background(string textureName = @"")

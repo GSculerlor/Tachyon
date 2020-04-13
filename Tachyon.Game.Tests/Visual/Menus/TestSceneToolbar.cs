@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Overlays;
+using Tachyon.Game.Overlays.Toolbar;
 
 namespace Tachyon.Game.Tests.Visual.Menus
 {
