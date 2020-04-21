@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Tachyon.Game.Beatmaps.ControlPoints;
-using Tachyon.Game.GameModes.Objects;
+using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.IO.Serialization;
 
 namespace Tachyon.Game.Beatmaps

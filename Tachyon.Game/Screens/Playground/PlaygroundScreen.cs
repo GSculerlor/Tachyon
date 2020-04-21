@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
+using Tachyon.Game.Screens.Playground.Detail;
 
 namespace Tachyon.Game.Screens.Playground
 {
@@ -23,6 +24,8 @@ namespace Tachyon.Game.Screens.Playground
         private MusicController music { get; set; }
         
         protected BeatmapCarousel Carousel { get; private set; }
+        
+        private BeatmapDetail beatmapDetail;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -33,13 +36,13 @@ namespace Tachyon.Game.Screens.Playground
                 {
                     Children = new Drawable[]
                     {
-                        new GridContainer
+                        new GridContainer 
                         {
                             RelativeSizeAxes = Axes.Both,
                             ColumnDimensions = new[]
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                                new Dimension(GridSizeMode.Relative, 0.4f),
+                                new Dimension(GridSizeMode.Relative, 0.6f),
                             },
                             Content = new[]
                             {
@@ -47,6 +50,28 @@ namespace Tachyon.Game.Screens.Playground
                                 {
                                     new Container
                                     {
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        RelativeSizeAxes = Axes.Both,
+
+                                        Children = new Drawable[]
+                                        {
+                                            beatmapDetail = new BeatmapDetail
+                                            {
+                                                Height = 240,
+                                                RelativeSizeAxes = Axes.X,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = 20,
+                                                    Right = 40,
+                                                },
+                                            }
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
                                         RelativeSizeAxes = Axes.Both,
                                         Child = Carousel = new BeatmapCarousel
                                         {
@@ -57,10 +82,10 @@ namespace Tachyon.Game.Screens.Playground
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
                                         },
-                                    }
+                                    },
                                 },
                             }
-                        },
+                        }
                     }
                 },
             });
@@ -119,7 +144,7 @@ namespace Tachyon.Game.Screens.Playground
             if (base.OnExiting(next))
                 return true;
 
-            //beatmapDetail.Hide();
+            beatmapDetail.Hide();
 
             this.FadeOut(100);
 
@@ -211,7 +236,7 @@ namespace Tachyon.Game.Screens.Playground
         
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            //beatmapDetail.Beatmap = beatmap;
+            beatmapDetail.Beatmap = beatmap;
 
             if (beatmap.Track != null)
                 beatmap.Track.Looping = true;

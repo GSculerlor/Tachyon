@@ -13,12 +13,6 @@ namespace Tachyon.Game.Tests
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            LoadComponentAsync(new ScreenStack(new TextureBackgroundScreen { Colour = TachyonColor.Gray(0.5f) })
-            {
-                Depth = 10,
-                RelativeSizeAxes = Axes.Both,
-            }, AddInternal);
             
             AddRange(new Drawable[]
             {

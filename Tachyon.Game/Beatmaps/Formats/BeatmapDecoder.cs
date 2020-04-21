@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using Tachyon.Game.Beatmaps.ControlPoints;
 using Tachyon.Game.Beatmaps.Objects;
 using Tachyon.Game.Beatmaps.Timing;
-using Tachyon.Game.GameModes.Objects.Converters;
 using Tachyon.Game.IO;
+using Tachyon.Game.Rulesets.Converters;
 
 namespace Tachyon.Game.Beatmaps.Formats
 {
@@ -60,6 +61,15 @@ namespace Tachyon.Game.Beatmaps.Formats
                     Logger.Log($"Failed to process line \"{line}\" into \"{beatmap}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
                 }
             }
+            
+            // Objects may be out of order *only* if a user has manually edited an .osu file.
+            // Unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
+            // OrderBy is used to guarantee that the parsing order of hitobjects with equal start times is maintained (stably-sorted)
+            // The parsing order of hitobjects matters in mania difficulty calculation
+            outputBeatmap.HitObjects = outputBeatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
+
+            foreach (var hitObject in outputBeatmap.HitObjects)
+                hitObject.ApplyDefaults(outputBeatmap.ControlPointInfo, outputBeatmap.BeatmapInfo.BaseDifficulty);
         }
         
         private bool shouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal) || line.StartsWith(' ') || line.StartsWith('_');

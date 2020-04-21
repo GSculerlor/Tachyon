@@ -3,15 +3,12 @@
  using System.Diagnostics;
  using System.Linq;
  using osu.Framework.Allocation;
- using osu.Framework.Bindables;
  using osu.Framework.Caching;
  using osu.Framework.Extensions.IEnumerableExtensions;
  using osu.Framework.Graphics;
  using osu.Framework.Graphics.Containers;
- using osu.Framework.Input.Bindings;
  using osu.Framework.Input.Events;
  using osu.Framework.Threading;
- using osu.Framework.Utils;
  using osuTK;
  using osuTK.Input;
  using Tachyon.Game.Beatmaps;
@@ -43,7 +40,7 @@
         public override bool PropagatePositionalInputSubTree => AllowSelection;
         public override bool PropagateNonPositionalInputSubTree => AllowSelection;
 
-        public bool BeatmapSetsLoaded { get; private set; }
+        private bool beatmapSetsLoaded;
 
         private readonly CarouselScrollContainer scroll;
 
@@ -57,14 +54,15 @@
 
         private void loadBeatmapSets(IEnumerable<BeatmapSetInfo> beatmapSets)
         {
-            CarouselRoot newRoot = new CarouselRoot(this);
+            CarouselRoot newRoot = new CarouselRoot();
 
-            beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
+            var beatmapSetInfos = beatmapSets.ToList();
+            beatmapSetInfos.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
 
             _ = newRoot.Drawables;
 
             root = newRoot;
-            if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
+            if (selectedBeatmapSet != null && !beatmapSetInfos.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
             scrollableContent.Clear(false);
@@ -74,7 +72,7 @@
             SchedulerAfterChildren.Add(() =>
             {
                 BeatmapSetsChanged?.Invoke();
-                BeatmapSetsLoaded = true;
+                beatmapSetsLoaded = true;
             });
         }
 
@@ -84,12 +82,12 @@
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
-        protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
+        private List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
         private CarouselRoot root;
 
         public BeatmapCarousel()
         {
-            root = new CarouselRoot(this);
+            root = new CarouselRoot();
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -108,7 +106,7 @@
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader]
         private void load()
         {
             beatmaps.ItemAdded += beatmapAdded;
@@ -135,7 +133,6 @@
             int? previouslySelectedID = null;
             CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-            // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
             if (existingSet?.State?.Value == CarouselItemState.Selected)
                 previouslySelectedID = selectedBeatmap?.Beatmap.ID;
 
@@ -152,11 +149,8 @@
 
             root.AddChild(newSet);
 
-            // only reset scroll position if already near the scroll target.
-            // without this, during a large beatmap import it is impossible to navigate the carousel.
-            applyActiveCriteria(false, alwaysResetScrollPosition: false);
+            applyActiveCriteria(false, false);
 
-            //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
                 select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 
@@ -245,25 +239,9 @@
 
         private float visibleHalfHeight => (DrawHeight + bleed_bottom + bleed_top) / 2;
 
-        /// <summary>
-        /// The position of the lower visible bound with respect to the current scroll position.
-        /// </summary>
         private float visibleBottomBound => scroll.Current + DrawHeight + bleed_bottom;
 
-        /// <summary>
-        /// The position of the upper visible bound with respect to the current scroll position.
-        /// </summary>
         private float visibleUpperBound => scroll.Current - bleed_top;
-
-        public void FlushPendingFilterOperations()
-        {
-            if (PendingFilter?.Completed == false)
-            {
-                applyActiveCriteria(false);
-                Update();
-            }
-        }
-
 
         private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
@@ -297,11 +275,11 @@
             switch (e.Key)
             {
                 case Key.Left:
-                    SelectNext(-1, true);
+                    SelectNext(-1);
                     return true;
 
                 case Key.Right:
-                    SelectNext(1, true);
+                    SelectNext();
                     return true;
             }
 
@@ -317,7 +295,7 @@
 
             scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
-            Trace.Assert(Items.Count == yPositions.Count);
+            Trace.Assert(items.Count == yPositions.Count);
 
             int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
@@ -328,7 +306,7 @@
 
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                DrawableCarouselItem item = Items[i];
+                DrawableCarouselItem item = items[i];
 
                 if (!item.Item.Visible)
                 {
@@ -337,7 +315,7 @@
                     continue;
                 }
 
-                float depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+                float depth = i + (item is DrawableCarouselBeatmapSet ? -items.Count : 0);
 
                 if (!scrollableContent.Contains(item))
                 {
@@ -367,7 +345,7 @@
                 itemsCache.Invalidate();
 
             foreach (DrawableCarouselItem p in scrollableContent.Children)
-                updateItem(p);
+                p.OriginPosition = new Vector2(-200, 0);
         }
 
         protected override void UpdateAfterChildren()
@@ -388,8 +366,7 @@
                 beatmaps.ItemRemoved -= beatmapRemoved;
             }
 
-            // aggressively dispose "off-screen" items to reduce GC pressure.
-            foreach (var i in Items)
+            foreach (var i in items)
                 i.Dispose();
         }
 
@@ -427,7 +404,7 @@
         
         private void updateItems()
         {
-            Items = root.Drawables.ToList();
+            items = root.Drawables.ToList();
 
             yPositions.Clear();
 
@@ -436,7 +413,7 @@
 
             scrollTarget = null;
 
-            foreach (DrawableCarouselItem d in Items)
+            foreach (DrawableCarouselItem d in items)
             {
                 if (d.IsPresent)
                 {
@@ -491,7 +468,7 @@
             currentY += visibleHalfHeight;
             scrollableContent.Height = currentY;
 
-            if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
+            if (beatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
                 selectedBeatmapSet = null;
                 SelectionChanged?.Invoke(null);
@@ -508,7 +485,6 @@
             {
                 if (firstScroll)
                 {
-                    // reduce movement when first displaying the carousel.
                     scroll.ScrollTo(scrollTarget.Value - 200, false);
                     firstScroll = false;
                 }
@@ -518,32 +494,10 @@
             }
         }
 
-        private static float offsetX(float dist, float halfHeight)
-        {
-            const float circle_radius = 3;
-            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
-
-            return 125 + x;
-        }
-
-        private void updateItem(DrawableCarouselItem p)
-        {
-            float itemDrawY = p.Position.Y - visibleUpperBound + p.DrawHeight / 2;
-            float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
-
-            p.OriginPosition = new Vector2(-offsetX(dist, visibleHalfHeight), 0);
-
-            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
-        }
-
         private class CarouselRoot : CarouselGroupEagerSelect
         {
-            private readonly BeatmapCarousel carousel;
-
-            public CarouselRoot(BeatmapCarousel carousel)
+            public CarouselRoot()
             {
-                this.carousel = carousel;
                 State.Value = CarouselItemState.Selected;
                 State.ValueChanged += state => State.Value = CarouselItemState.Selected;
             }

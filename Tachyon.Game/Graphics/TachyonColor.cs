@@ -1,5 +1,6 @@
 ﻿using System;
 using osuTK.Graphics;
+using Tachyon.Game.Rulesets.Scoring;
 
 namespace Tachyon.Game.Graphics
 {
@@ -83,8 +84,35 @@ namespace Tachyon.Game.Graphics
         public readonly Color4 BlueDark = FromHex(@"44aadd");
         public readonly Color4 BlueDarker = FromHex(@"2299bb");
         
+        public readonly Color4 RedLighter = FromHex(@"ffeded");
+        public readonly Color4 RedLight = FromHex(@"ed7787");
+        public readonly Color4 Red = FromHex(@"ed1121");
+        public readonly Color4 RedDark = FromHex(@"ba0011");
+        public readonly Color4 RedDarker = FromHex(@"870000");
+        
         public readonly Color4 RedSomething = FromHex(@"E9291A");
 
         public readonly Color4 BackButtonGray = FromHex(@"313131");
+        
+        /// <summary>
+        /// Retrieves the colour for a <see cref="HitResult"/>.
+        /// </summary>
+        public Color4 ForHitResult(HitResult judgement)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                    return Blue;
+                
+                case HitResult.Late:
+                    return Yellow;
+
+                case HitResult.Miss:
+                    return Red;
+
+                default:
+                    return Color4.White;
+            }
+        }
     }
 }

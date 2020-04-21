@@ -1,187 +1,203 @@
-﻿using System;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Beatmaps.Drawables;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
 
 namespace Tachyon.Game.Screens.Playground.Detail
 {
-    public class BeatmapDetail : CompositeDrawable
+    public class BeatmapDetail : VisibilityContainer
     {
-        private const float height = 145;
-        
-        private FillFlowContainer flow;
+        protected BeatmapDetailContent DetailContent;
+        private BeatmapDetailContent loadingDetailContent;
         
         private WorkingBeatmap beatmap;
 
-        protected BeatmapMetadataDetail MetadataDetail;
-        
         public WorkingBeatmap Beatmap
         {
             get => beatmap;
             set
             {
-                if (beatmap == value)
-                    return;
+                if (beatmap == value) return;
 
                 beatmap = value;
-                updateBeatmapDetail();
+                updateDetail();
             }
         }
         
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public BeatmapDetail()
         {
-            RelativeSizeAxes = Axes.X;
-            Width = 0.7f;
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
-
-            InternalChildren = new Drawable[]
+            Masking = true;
+            BorderColour = new Color4(221, 255, 255, 255);
+            Alpha = 0;
+            EdgeEffect = new EdgeEffectParameters
             {
-                flow = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    LayoutDuration = 500,
-                    LayoutEasing = Easing.OutQuint,
-                    Direction = FillDirection.Full,
-                    CornerRadius = height / 2,
-                    CornerExponent = 2,
-                }
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(130, 204, 255, 150),
+                Radius = 20,
             };
         }
-
-        private void updateBeatmapDetail()
+        
+        public override bool IsPresent => base.IsPresent || DetailContent == null;
+        
+        protected override void PopIn()
         {
+            this.MoveToX(0, 800, Easing.OutQuint);
+            this.FadeIn(250);
+        }
+
+        protected override void PopOut()
+        {
+            this.MoveToX(-100, 800, Easing.In);
+            this.FadeOut(250, Easing.In);
+        }
+
+        private void updateDetail()
+        {
+            void removeOldInfo()
+            {
+                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                DetailContent?.FadeOut(250);
+                DetailContent?.Expire();
+                DetailContent = null;
+            }
+
             if (beatmap == null)
             {
-                flow.Clear();
+                removeOldInfo();
                 return;
             }
 
-            flow.Children = new Drawable[]
+            LoadComponentAsync(loadingDetailContent = new BeatmapDetailContent(beatmap)
             {
-                MetadataDetail = new BeatmapMetadataDetail(beatmap)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 1f,
-                    Height = height / 2,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight, 
-                }
-            };
+                Shear = -Shear,
+                Depth = DetailContent?.Depth + 1 ?? 0
+            }, loaded =>
+            {
+                if (loaded != loadingDetailContent) return;
+
+                removeOldInfo();
+                Add(DetailContent = loaded);
+            });
         }
 
-        public class BeatmapMetadataDetail : CompositeDrawable
+        public class BeatmapDetailContent : BufferedContainer
         {
-            private readonly BeatmapInfo beatmapInfo;
+            private readonly WorkingBeatmap beatmap;
             
             public TachyonSpriteText TitleLabel { get; private set; }
+            public TachyonSpriteText ArtistLabel { get; private set; }
             
-            public BeatmapMetadataDetail(WorkingBeatmap beatmap)
-            {
-                Width = 400;
-                Height = 50;
+            private ILocalisedBindableString titleBinding;
+            private ILocalisedBindableString artistBinding;
 
-                beatmapInfo = beatmap.BeatmapInfo;
+            public BeatmapDetailContent(WorkingBeatmap beatmap)
+            {
+                this.beatmap = beatmap;
             }
-            
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Masking = true;
 
-                AddRangeInternal(new Drawable[]
+            [BackgroundDependencyLoader]
+            private void load(LocalisationManager localisation)
+            {
+                var beatmapInfo = beatmap.BeatmapInfo;
+                var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                
+                CacheDrawnFrameBuffer = true;
+                RedrawOnScale = false;
+
+                RelativeSizeAxes = Axes.Both;
+                
+                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+                artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
+
+
+                Children = new Drawable[]
                 {
                     new Box
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Width = 2f,
-                        Colour = TachyonColor.Gray(0.93f),
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
+                        Children = new[]
+                        {
+                            new BeatmapBackgroundSprite(beatmap)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                FillMode = FillMode.Fill,
+                            },
+                        },
                     },
                     new FillFlowContainer
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        Name = "Bottom-aligned metadata",
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Y = -7,
                         Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Left = 25, Bottom = 25 },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             TitleLabel = new TachyonSpriteText
                             {
-                                Text = new LocalisedString((
-                                    $"{beatmapInfo.Metadata.ArtistUnicode ?? beatmapInfo.Metadata.Artist} - {beatmapInfo.Metadata.TitleUnicode ?? beatmapInfo.Metadata.Title}",
-                                    $"{beatmapInfo.Metadata.Artist} - {beatmapInfo.Metadata.Title}")),
-                                Font = TachyonFont.Default.With(weight: FontWeight.Bold, size: 40),
+                                Font = TachyonFont.GetFont(size: 28, weight: FontWeight.Bold),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
-                            new FillFlowContainer
+                            ArtistLabel = new TachyonSpriteText
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
-                                {
-                                    new TachyonSpriteText
-                                    {
-                                        Text = "difficulty",
-                                        Padding = new MarginPadding { Right = 5 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Regular, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = beatmapInfo.Version,
-                                        Padding = new MarginPadding { Right = 20 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Bold, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = "star rating",
-                                        Padding = new MarginPadding { Right = 5 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Regular, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = $"{beatmapInfo.StarDifficulty:0.#}",
-                                        Padding = new MarginPadding { Right = 20 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Bold, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = "BPM",
-                                        Padding = new MarginPadding { Right = 5 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Regular, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = $"{beatmapInfo.BeatmapSet?.MaxBPM:0.#}",
-                                        Padding = new MarginPadding { Right = 20 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Bold, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = "length",
-                                        Padding = new MarginPadding { Right = 5 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Regular, size: 24)
-                                    },
-                                    new TachyonSpriteText
-                                    {
-                                        Text = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToString(@"mm\:ss"),
-                                        Padding = new MarginPadding { Right = 20 },
-                                        Font = TachyonFont.Default.With(weight: FontWeight.Bold, size: 24)
-                                    },
-                                }
-                            }
-                        },
+                                Font = TachyonFont.GetFont(size: 20, weight: FontWeight.SemiBold),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
+                            },
+                            new TachyonSpriteText
+                            {
+                                Font = TachyonFont.GetFont(size: 16, weight: FontWeight.Bold),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
+                                Text = $"BPM {getBPMRange(beatmap.Beatmap)}"
+                            },
+                        }
                     }
-                });
+                };
+                
+                titleBinding.BindValueChanged(_ => setMetadata());
+                artistBinding.BindValueChanged(_ => setMetadata(), true);
+            }
+            
+            private void setMetadata()
+            {
+                ArtistLabel.Text = artistBinding.Value;
+                TitleLabel.Text = titleBinding.Value;
+                ForceRedraw();
+            }
+            
+            private string getBPMRange(IBeatmap beatmap)
+            {
+                double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
+                double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
+
+                if (Precision.AlmostEquals(bpmMin, bpmMax))
+                    return $"{bpmMin:0}";
+
+                return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
             }
         }
     }

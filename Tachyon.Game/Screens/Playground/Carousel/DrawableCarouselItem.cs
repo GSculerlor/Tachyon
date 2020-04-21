@@ -3,11 +3,8 @@ using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osuTK;
-using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 
 namespace Tachyon.Game.Screens.Playground.Carousel
@@ -23,7 +20,6 @@ namespace Tachyon.Game.Screens.Playground.Carousel
         public readonly CarouselItem Item;
 
         private Container nestedContainer;
-        private Container borderContainer;
 
         private Box hoverLayer;
 
@@ -41,12 +37,10 @@ namespace Tachyon.Game.Screens.Playground.Carousel
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, TachyonColor colors)
         {
-            InternalChild = borderContainer = new Container
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                CornerRadius = 10,
-                BorderColour = new Color4(221, 255, 255, 255),
                 Children = new Drawable[]
                 {
                     nestedContainer = new Container
@@ -76,8 +70,6 @@ namespace Tachyon.Game.Screens.Playground.Carousel
             hoverLayer.FadeOut(1000, Easing.OutQuint);
             base.OnHoverLost(e);
         }
-
-        public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
 
         protected override void LoadComplete()
         {
@@ -112,29 +104,11 @@ namespace Tachyon.Game.Screens.Playground.Carousel
         protected virtual void Selected()
         {
             Item.State.Value = CarouselItemState.Selected;
-
-            borderContainer.BorderThickness = 2.5f;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
-                Roundness = 10,
-            };
         }
 
         protected virtual void Deselected()
         {
             Item.State.Value = CarouselItemState.NotSelected;
-
-            borderContainer.BorderThickness = 0;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(1),
-                Radius = 10,
-                Colour = Color4.Black.Opacity(100),
-            };
         }
 
         protected override bool OnClick(ClickEvent e)

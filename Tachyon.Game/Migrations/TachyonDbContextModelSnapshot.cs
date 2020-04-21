@@ -189,6 +189,30 @@ namespace Tachyon.Game.Migrations
                     b.ToTable("FileInfo");
                 });
 
+            modelBuilder.Entity("Tachyon.Game.Input.Bindings.DatabasedKeyBinding", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("IntAction")
+                        .HasColumnName("Action");
+
+                    b.Property<string>("KeysString")
+                        .HasColumnName("Keys");
+
+                    b.Property<int?>("RulesetID");
+
+                    b.Property<int?>("Variant");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("IntAction");
+
+                    b.HasIndex("RulesetID", "Variant");
+
+                    b.ToTable("KeyBinding");
+                });
+
             modelBuilder.Entity("Tachyon.Game.Beatmaps.BeatmapInfo", b =>
                 {
                     b.HasOne("Tachyon.Game.Beatmaps.BeatmapDifficulty", "BaseDifficulty")

@@ -22,7 +22,7 @@ namespace Tachyon.Game.Screens.Playground.Carousel
             : base(panel)
         {
             beatmap = panel.Beatmap;
-            Height *= 0.60f;
+            Height *= 0.5f;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -45,7 +45,7 @@ namespace Tachyon.Game.Screens.Playground.Carousel
                     {
                         new FillFlowContainer
                         {
-                            Padding = new MarginPadding { Left = 5 },
+                            Padding = new MarginPadding { Left = 10 },
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -60,7 +60,7 @@ namespace Tachyon.Game.Screens.Playground.Carousel
                                         new TachyonSpriteText
                                         {
                                             Text = beatmap.Version,
-                                            Font = TachyonFont.GetFont(size: 20),
+                                            Font = TachyonFont.GetFont(size: 20, weight: FontWeight.SemiBold),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
@@ -77,16 +77,14 @@ namespace Tachyon.Game.Screens.Playground.Carousel
         {
             base.Selected();
 
-            background.Colour = ColourInfo.GradientVertical(
-                new Color4(20, 43, 51, 255),
-                new Color4(40, 86, 102, 255));
+            background.Colour = new Color4(181, 84, 0, 255);
         }
 
         protected override void Deselected()
         {
             base.Deselected();
 
-            background.Colour = new Color4(20, 43, 51, 255);
+            background.Colour = new Color4(34, 40, 49, 255);
         }
     }
 }

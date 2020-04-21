@@ -7,7 +7,8 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
-using Tachyon.Game.GameModes.Objects.Types;
+using Tachyon.Game.Rulesets;
+using Tachyon.Game.Rulesets.Objects.Types;
 
 namespace Tachyon.Game.Beatmaps
 {
@@ -63,15 +64,17 @@ namespace Tachyon.Game.Beatmaps
             return AudioManager.Tracks.GetVirtual(length);
         }
 
-        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new BeatmapConverter(beatmap);
+        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap(TimeSpan? timeout = null)
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, TimeSpan? timeout = null)
         {
             using (var cancellationSource = new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10)))
             {
-                IBeatmapConverter converter = CreateBeatmapConverter(Beatmap);
+                var rulesetInstance = ruleset.CreateInstance();
+                
+                IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
-                if (Beatmap.HitObjects.Count > 0)
+                if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
                     throw new Exception($"{nameof(Beatmaps.Beatmap)} can not be converted, converter: {converter}).");
                     
                 IBeatmap converted = converter.Convert();

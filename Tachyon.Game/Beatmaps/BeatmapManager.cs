@@ -14,9 +14,9 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using Tachyon.Game.Beatmaps.Formats;
 using Tachyon.Game.Database;
-using Tachyon.Game.GameModes.Objects;
 using Tachyon.Game.IO;
 using Tachyon.Game.IO.Archives;
+using Tachyon.Game.Rulesets.Objects;
 
 namespace Tachyon.Game.Beatmaps
 {

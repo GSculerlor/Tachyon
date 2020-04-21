@@ -15,14 +15,19 @@ using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Configuration;
 using Tachyon.Game.Database;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Input;
 using Tachyon.Game.IO;
 
 namespace Tachyon.Game
 {
     public class TachyonGameBase : osu.Framework.Game, ICanAcceptFiles
     {
+        public const int SAMPLE_CONCURRENCY = 6;
+        
         private DependencyContainer dependencies;
         private TachyonConfigManager LocalConfig;
+        
+        protected KeyBindingStore KeyBindingStore;
         
         protected FileStore FileStore;
         protected BeatmapManager BeatmapManager;
@@ -75,12 +80,15 @@ namespace Tachyon.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Medium");
             
+            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
+            
             runMigrations();
             
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
             
             var defaultBeatmap = new PlaceholderWorkingBeatmap(Audio, Textures);
             
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, Audio, Host, defaultBeatmap));
             dependencies.Cache(new TachyonColor());
             

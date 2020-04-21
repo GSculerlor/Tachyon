@@ -17,8 +17,6 @@
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem
     {
-        private Action<int> viewDetails;
-
         private readonly BeatmapSetInfo beatmapSet;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
@@ -47,20 +45,20 @@
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
+                    Padding = new MarginPadding { Vertical = 10, Horizontal = 20 },
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         new TachyonSpriteText
                         {
                             Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            Font = TachyonFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
+                            Font = TachyonFont.GetFont(weight: FontWeight.Bold, size: 28),
                             Shadow = true,
                         },
                         new TachyonSpriteText
                         {
                             Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            Font = TachyonFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
+                            Font = TachyonFont.GetFont(weight: FontWeight.SemiBold, size: 20),
                             Shadow = true,
                         }
                     }

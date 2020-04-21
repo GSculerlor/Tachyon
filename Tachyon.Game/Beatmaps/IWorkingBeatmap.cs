@@ -1,6 +1,7 @@
 ﻿using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using Tachyon.Game.Rulesets;
 
 namespace Tachyon.Game.Beatmaps
 {
@@ -8,7 +9,7 @@ namespace Tachyon.Game.Beatmaps
     {
         IBeatmap Beatmap { get; }
         
-        IBeatmap GetPlayableBeatmap(TimeSpan? timeout = null);
+        IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, TimeSpan? timeout = null);
         
         Texture Background { get; }
         

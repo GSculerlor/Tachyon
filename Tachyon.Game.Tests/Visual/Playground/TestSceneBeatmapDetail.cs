@@ -4,9 +4,8 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osuTK;
 using Tachyon.Game.Beatmaps;
-using Tachyon.Game.GameModes.Objects;
-using Tachyon.Game.GameModes.Objects.Converters;
-using Tachyon.Game.Screens.Playground;
+using Tachyon.Game.Rulesets.Converters;
+using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.Screens.Playground.Detail;
 
 namespace Tachyon.Game.Tests.Visual.Playground
@@ -57,20 +56,20 @@ namespace Tachyon.Game.Tests.Visual.Playground
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
-            AddAssert("check default title", () => beatmapDetail.MetadataDetail.TitleLabel.Text == $"{Beatmap.Default.BeatmapInfo.Metadata.Artist} - {Beatmap.Default.BeatmapInfo.Metadata.Title}");
+            AddAssert("check default title", () => beatmapDetail.DetailContent.TitleLabel.Text == $"{Beatmap.Default.BeatmapInfo.Metadata.Artist} - {Beatmap.Default.BeatmapInfo.Metadata.Title}");
         }
 
         private void selectBeatmap([CanBeNull] IBeatmap beatmap)
         {
-            BeatmapDetail.BeatmapMetadataDetail previousContent = null;
+            BeatmapDetail.BeatmapDetailContent previousContent = null;
 
             AddStep($"select {beatmap?.Metadata.Title ?? "null"} beatmap", () =>
             {
-                previousContent = beatmapDetail.MetadataDetail;
+                previousContent = beatmapDetail.DetailContent;
                 beatmapDetail.Beatmap = Beatmap.Value = beatmap == null ? Beatmap.Default : CreateWorkingBeatmap(beatmap);
             });
 
-            AddUntilStep("wait for async load", () => beatmapDetail.MetadataDetail != previousContent);
+            AddUntilStep("wait for async load", () => beatmapDetail.DetailContent != previousContent);
         }
 
         private IBeatmap createTestBeatmap()
@@ -105,12 +104,12 @@ namespace Tachyon.Game.Tests.Visual.Playground
 
         private void testBeatmapLabel()
         {
-            AddAssert("check title", () => beatmapDetail.MetadataDetail.TitleLabel.Text == @"YOASOBI - あの夢をなぞって");
+            AddAssert("check title", () => beatmapDetail.DetailContent.TitleLabel.Text == @"YOASOBI - あの夢をなぞって");
         }
         
         private class TestBeatmapDetail : BeatmapDetail
         {
-            public new BeatmapMetadataDetail MetadataDetail => base.MetadataDetail;
+            public new BeatmapDetailContent DetailContent => base.DetailContent;
         }
     }
 }
