@@ -304,6 +304,14 @@ namespace Tachyon.Game.Rulesets.UI
         }
     }
     
+    public class BeatmapInvalidForRulesetException : ArgumentException
+    {
+        public BeatmapInvalidForRulesetException(string text)
+            : base(text)
+        {
+        }
+    }
+    
     public class FallbackSampleStore : ISampleStore
     {
         private readonly ISampleStore primary;

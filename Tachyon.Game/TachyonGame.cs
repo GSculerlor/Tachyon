@@ -14,9 +14,7 @@ using osu.Framework.Threading;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics.Containers;
-using Tachyon.Game.Overlays;
 using Tachyon.Game.Overlays.Music;
-using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -24,20 +22,12 @@ namespace Tachyon.Game
 {
     public class TachyonGame : TachyonGameBase
     {
-        public Toolbar Toolbar;
-
         private TachyonScreenStack screenStack;
         private IntroScreen introScreen;
         private DependencyContainer dependencies;
         private Container rightFloatingOverlayContent;
-        private Container leftFloatingOverlayContent;
-        private Container bottomMostOverlayContent;
-        private Container overlayContainer;
         private MusicController musicController;
-        private ScalingContainer screenContainer;
-        
-        public float ToolbarOffset => Toolbar.DrawHeight + 10;
-        
+
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
         
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -62,7 +52,7 @@ namespace Tachyon.Game
 
             AddRange(new Drawable[]
             {
-                screenContainer = new ScalingContainer
+                new ScalingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -70,18 +60,13 @@ namespace Tachyon.Game
                         screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContainer = new Container { RelativeSizeAxes = Axes.Both },
-                bottomMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
             });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
             
             screenStack.Push(createLoader().With(l => l.RelativeSizeAxes = Axes.Both));
-            
-            loadComponentSingleFile(Toolbar = new Toolbar(), bottomMostOverlayContent.Add);
 
             loadComponentSingleFile(musicController = new MusicController(), Add, true);
             
@@ -89,20 +74,14 @@ namespace Tachyon.Game
             {
                 Margin = new MarginPadding
                 {
-                    Top = ToolbarOffset,
+                    Top = 46,
                     Right = 10
                 },
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
-            
-            Screen.BindTo(Toolbar.Screen);
         }
-        
-        [Cached]
-        [Cached(typeof(IBindable<Toolbar.MenuScreen>))]
-        protected readonly Bindable<Toolbar.MenuScreen> Screen = new Bindable<Toolbar.MenuScreen>();
-        
+
         protected override Container CreateScalingContainer() => new ScalingContainer();
 
         private LoaderScreen createLoader() => new LoaderScreen();
@@ -193,12 +172,6 @@ namespace Tachyon.Game
             return base.OnExiting();
         }
         
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            overlayContainer.Padding = new MarginPadding { Top = ToolbarOffset };
-        }
 
         // ReSharper disable once UnusedParameter.Local
         private void screenChanged(IScreen current, IScreen newScreen)
@@ -212,15 +185,7 @@ namespace Tachyon.Game
 
             if (newScreen is ITachyonScreen newTachyonScreen)
             {
-                if (newTachyonScreen.ToolbarVisible)
-                    Toolbar?.Show();
-                else
-                    Toolbar?.Hide();
                 
-                /*if (newTachyonScreen.AllowBackButton)
-                    Toolbar?.ToolbarBackButton?.Show();
-                else
-                    Toolbar?.ToolbarBackButton?.Hide();*/
             }
         }
 

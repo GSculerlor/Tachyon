@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -18,7 +18,7 @@ namespace Tachyon.Game.Screens
             return false;
         }
         
-        public bool Equals(BackgroundScreen other)
+        public virtual bool Equals(BackgroundScreen other)
         {
             return other?.GetType() == GetType();
         }

@@ -1,4 +1,7 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -9,188 +12,173 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osuTK;
 using osuTK.Graphics;
+using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Backgrounds;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
+using Tachyon.Game.Graphics.UserInterface;
+using Tachyon.Game.IO.Archives;
 using Tachyon.Game.Screens.Backgrounds;
 using Tachyon.Game.Screens.Placeholder;
+using Tachyon.Game.Screens.Select;
+using Tachyon.Game.Screens.Select;
 
 namespace Tachyon.Game.Screens.Menu
 {
     public class IntroScreen : TachyonScreen
     {
-        private const int start_button_height = 100;
+        public bool DidLoadMenu { get; private set; }
 
-        private MainMenu mainMenu;
+        private Box gradientBox;
+        private FillFlowContainer textContainer;
+        private TachyonScreen songSelection;
+        
+        private WorkingBeatmap introBeatmap;
+        private LeasedBindable<WorkingBeatmap> beatmap;
+        private Track track;
 
+        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+        
+        [Resolved]
+        private AudioManager audio { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapManager beatmaps, osu.Framework.Game game)
+        {
+            AddRangeInternal(new Drawable[]
+            {
+                gradientBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("000").Opacity(0.2f), Color4Extensions.FromHex("000").Opacity(0.8f))
+                },
+                textContainer = new FillFlowContainer
+                {
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = 100 },
+                    Spacing = new Vector2(0, 20),
+                    Children = new Drawable[]
+                    {
+                        new TachyonSpriteText
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Spacing = new Vector2(10, 0),
+                            Text = "Touch screen to start",
+                            Font = TachyonFont.Default.With(size: 30, weight: FontWeight.SemiBold),    
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(10),
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(60),
+                                    Icon = FontAwesome.Solid.Meteor
+                                },
+                                new TachyonSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Spacing = new Vector2(20, 0),
+                                    Margin = new MarginPadding { Bottom = 4, Left = 20 },
+                                    Font = TachyonFont.GetFont(size: 60, weight: FontWeight.Bold),
+                                    Text = "tachyon"
+                                },
+                            }
+                        },
+                    }
+                }
+            });            
+            
+            //textFlow.AddParagraph("Touch or click anywhere to continue", t => t.Font = TachyonFont.Default.With(size: 30, weight: FontWeight.Regular));
+
+            beatmap = Beatmap.BeginLease(false);
+            
+            BeatmapSetInfo setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/blue_haven.osz"), "blue_haven.osz")).Result;
+            beatmaps.Update(setInfo);
+            
+            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            track = introBeatmap.Track;
+        }
+        
         public override bool AllowBackButton => false;
 
         public override bool ToolbarVisible => false;
+        
+        private void prepareMainMenu() => LoadComponentAsync(songSelection = new TachyonSongSelect());
+        
+        protected override BackgroundScreen CreateBackground() => new TextureBackgroundScreen();
 
-        public IntroScreen()
+        public override void OnEntering(IScreen last)
         {
-            ValidForResume = false;
-
-            AddInternal(new Container
+            base.OnEntering(last);
+            
+            Scheduler.AddDelayed(delegate
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new IntroBackgroundImage(),
-                    new StartButton
-                    {
-                        Action = () => this.Push(mainMenu)
-                    }
-                },
-            });
+                startTrack();
 
-            Scheduler.Add(PrepareMainMenu);
+                prepareMainMenu();
+            }, 500);
         }
 
-        private void PrepareMainMenu() => LoadComponentAsync(mainMenu = new MainMenu());
+        public override bool OnExiting(IScreen next) => !DidLoadMenu;
         
-        protected override BackgroundScreen CreateBackground() => new BlackScreen();
-        
-        private class IntroBackgroundImage : Background
+        public override void OnResuming(IScreen last)
         {
-            private const string textureName = @"Characters/Exusiai_2";
+            this.FadeIn(300);
 
-            public IntroBackgroundImage() : base(textureName)
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Bottom = start_button_height };
-                Masking = true;
-                MaskingSmoothness = 0;
-                
-                AddRangeInternal(new Drawable[]
-                {
-                    new Box
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.2f), Color4.Black.Opacity(1f))
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Horizontal = 25, Vertical = 5},
-                        Children = new Drawable[]
-                        {
-                            new TachyonSpriteText
-                            {
-                                Margin = new MarginPadding
-                                {
-                                    Bottom = 5,
-                                },
-                                Font = TachyonFont.GetFont(Typeface.Quicksand, 40, FontWeight.Bold),
-                                Text = @"Tachyon",
-                            },
-                            new TachyonTextFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Text = @"A tachyon is any hypothetical particle that can travel faster than the speed of light. The term tachyon was coined by Gerald Feinberg in 1967. Most scientists do not believe that tachyons exist. Einstein's theory of special relativity states that nothing can accelerate faster than the speed of light, while tachyons are theorized to be constantly traveling faster than the speed of light. If a tachyon did exist, it would have an imaginary number as its mass. Gaada hubungannya sama gambar, emang cuma buat pemanis doang sih itu."
-                            }
-                        }
-                    }
-                });
-            }
+            double fadeOutTime = 500;
+
+            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
+            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
+
+            Game.FadeTo(0.01f, fadeOutTime);
+
+            base.OnResuming(last);
         }
 
-        private class StartButton : ClickableContainer
+        public override void OnSuspending(IScreen next)
         {
-            private Color4 colorNormal;
-            private Color4 colorHover;
-            private Box box;
-            private AspectRatioContainer container;
+            base.OnSuspending(next);
+            track = null;
+        }
+        
+        private void startTrack()
+        {
+            track.Restart();
+        }
+        
+        private void loadMenu()
+        {
+            beatmap.Return();
 
-            public StartButton()
+            DidLoadMenu = true;
+            this.Push(songSelection);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            Scheduler.AddDelayed(delegate
             {
-                Origin = Anchor.BottomCentre;
-                RelativeSizeAxes = Axes.X;
-                RelativePositionAxes = Axes.Both;
-                Position = new Vector2(0.5f, 1f);
-                Size = new Vector2(1, start_button_height);
-                Action = () => Action?.Invoke();
-            }
+                textContainer.FadeOutFromOne(500, Easing.OutQuart);
+                gradientBox.FadeColour(Color4.Black, 500, Easing.OutQuart);
 
-            [BackgroundDependencyLoader]
-            private void load(TachyonColor color)
-            {
-                colorNormal = color.Yellow;
-                colorHover = color.YellowDark;
-
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.X,
-                        Height = start_button_height,
-                        Colour = Color4.Black
-                    },
-                    container = new AspectRatioContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Y,
-                        Height = 0.5f,
-                        Masking = true,
-                        Multiplier = 1,
-                        Children = new Drawable[]
-                        {
-                            box = new Box
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colorNormal,
-                            },
-                            new SpriteIcon
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                Size = new Vector2(15), 
-                                Shadow = true, 
-                                Icon = FontAwesome.Solid.ChevronRight
-                            },
-                        }
-                    }
-                };
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                box.FadeColour(colorHover, 500, Easing.OutQuint);
-                return true;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                box.FadeColour(colorNormal, 500, Easing.OutQuint);
-                base.OnHoverLost(e);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                container.ScaleTo(0.75f, 500, Easing.OutQuint);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                container.ScaleTo(1, 1000, Easing.OutElastic);
-                base.OnMouseUp(e);
-            }
+                Scheduler.AddDelayed(loadMenu, 500);
+            }, 500);
+            
+            return true;
         }
     }
 }

@@ -8,8 +8,8 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using Tachyon.Game.Beatmaps;
-using Tachyon.Game.Screens.Playground;
-using Tachyon.Game.Screens.Playground.Carousel;
+using Tachyon.Game.Screens.Select;
+using Tachyon.Game.Screens.Select.Carousel;
 
 namespace Tachyon.Game.Tests.Visual.Playground
 {

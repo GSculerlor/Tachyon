@@ -59,7 +59,7 @@ namespace Tachyon.Game.Screens
 
         private TachyonScreen createLoadableScreen()
         {
-            return new IntroScreen();
+            return new HeadsetTextScreen(new IntroScreen());
         }
     }
 }
