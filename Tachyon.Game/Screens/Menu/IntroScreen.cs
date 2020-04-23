@@ -14,14 +14,9 @@ using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics;
-using Tachyon.Game.Graphics.Backgrounds;
-using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
-using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.IO.Archives;
 using Tachyon.Game.Screens.Backgrounds;
-using Tachyon.Game.Screens.Placeholder;
-using Tachyon.Game.Screens.Select;
 using Tachyon.Game.Screens.Select;
 
 namespace Tachyon.Game.Screens.Menu

@@ -17,11 +17,5 @@ namespace Tachyon.Game.Rulesets.Judgements
             : base(result, judgedObject)
         {
         }
-        
-        protected override void ApplyHitAnimations()
-        {
-            this.MoveToY(-100, 500);
-            base.ApplyHitAnimations();
-        }
     }
 }

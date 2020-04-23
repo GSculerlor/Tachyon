@@ -62,7 +62,7 @@ namespace Tachyon.Game.Screens.Select
 
                                         Children = new Drawable[]
                                         {
-                                            beatmapDetail = new BeatmapDetail
+                                            /*beatmapDetail = new BeatmapDetail
                                             {
                                                 Height = 240,
                                                 RelativeSizeAxes = Axes.X,
@@ -71,7 +71,7 @@ namespace Tachyon.Game.Screens.Select
                                                     Top = 20,
                                                     Right = 40,
                                                 },
-                                            }
+                                            }*/
                                         }
                                     },
                                     new Container
@@ -248,7 +248,7 @@ namespace Tachyon.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            beatmapDetail.Hide();
+            //beatmapDetail.Hide();
 
             this.FadeOut(100);
 
@@ -271,7 +271,7 @@ namespace Tachyon.Game.Screens.Select
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
-            beatmapDetail.Beatmap = beatmap;
+            //beatmapDetail.Beatmap = beatmap;
 
             if (beatmap.Track != null)
                 beatmap.Track.Looping = true;

@@ -7,7 +7,7 @@ namespace Tachyon.Game.Rulesets.UI
 {
     public class TachyonPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
-        private const float default_relative_height = TachyonPlayfield.DEFAULT_HEIGHT / 768;
+        private const float default_relative_height = (Row.DEFAULT_HEIGHT * 2) / 768;
         private const float default_aspect = 16f / 9f;
 
         public TachyonPlayfieldAdjustmentContainer()

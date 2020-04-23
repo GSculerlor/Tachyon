@@ -1,9 +1,13 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Rulesets.Objects.Drawables;
@@ -16,24 +20,21 @@ namespace Tachyon.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : CompositeDrawable
     {
-        private const float judgement_size = 128;
-
         protected readonly JudgementResult Result;
 
         public readonly DrawableHitObject JudgedObject;
 
         protected Container JudgementBody;
-        protected SpriteText JudgementText;
 
         /// <summary>
         /// Duration of initial fade in.
         /// </summary>
-        protected virtual double FadeInDuration => 100;
+        private double fadeInDuration => 100;
 
         /// <summary>
-        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
+        /// Duration to wait until fade out begins. Defaults to <see cref="fadeInDuration"/>.
         /// </summary>
-        protected virtual double FadeOutDelay => FadeInDuration;
+        private double fadeOutDelay => fadeInDuration;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -44,8 +45,7 @@ namespace Tachyon.Game.Rulesets.Judgements
         {
             Result = result;
             JudgedObject = judgedObject;
-
-            Size = new Vector2(judgement_size);
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -56,45 +56,59 @@ namespace Tachyon.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = new TachyonSpriteText
+                Child = new FillFlowContainer
                 {
-                    Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = TachyonFont.Numeric.With(size: 20),
-                    Colour = colors.ForHitResult(Result.Type),
-                    Scale = new Vector2(0.85f, 1),
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colors.ForHitResult(Result.Type).Opacity(0.5f),
+                            Width = 0.2f,
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientHorizontal(colors.ForHitResult(Result.Type).Opacity(0.5f), colors.ForHitResult(Result.Type).Opacity(0.2f)),
+                            Width = 0.2f,
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientHorizontal(colors.ForHitResult(Result.Type).Opacity(0.2f), colors.ForHitResult(Result.Type).Opacity(0.1f)),
+                            Width = 0.2f,
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientHorizontal(colors.ForHitResult(Result.Type).Opacity(0.1f), colors.ForHitResult(Result.Type).Opacity(0f)),
+                            Width = 0.2f,
+                        },
+                    }
+                },
             };
         }
 
         protected virtual void ApplyHitAnimations()
         {
-            JudgementBody.ScaleTo(0.9f);
-            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+            JudgementBody.FadeInFromZero(400, Easing.OutElastic);
 
-            this.Delay(FadeOutDelay).FadeOut(400);
+            this.Delay(fadeOutDelay).FadeOut(400);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
+            this.FadeInFromZero(fadeInDuration, Easing.OutQuint);
 
             switch (Result.Type)
             {
                 case HitResult.None:
                     break;
-
-                case HitResult.Miss:
-                    JudgementBody.ScaleTo(1.6f);
-                    JudgementBody.ScaleTo(1, 100, Easing.In);
-
-                    JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-                    JudgementBody.RotateTo(40, 800, Easing.InQuint);
-
-                    this.Delay(600).FadeOut(200);
-                    break;
-
+                
                 default:
                     ApplyHitAnimations();
                     break;

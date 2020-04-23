@@ -4,12 +4,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Bindings;
 using osuTK;
 using Tachyon.Game.Rulesets.UI.Scrolling;
 
 namespace Tachyon.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableTachyonHitObject : DrawableHitObject<TachyonHitObject>
+    public abstract class DrawableTachyonHitObject : DrawableHitObject<TachyonHitObject>, IKeyBindingHandler<TachyonAction>
     {
         protected readonly IBindable<TachyonAction> Action = new Bindable<TachyonAction>();
         

@@ -108,6 +108,7 @@ namespace Tachyon.Game.Rulesets.Beatmaps
                             {
                                 StartTime = j,
                                 Type = isUpper ? NoteType.Upper : NoteType.Lower,
+                                Row = isUpper ? 0 : 1,
                                 Samples = currentSamples,
                             };
 
@@ -121,7 +122,8 @@ namespace Tachyon.Game.Rulesets.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4
+                            TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4,
+                            Row = 0
                         };
                     }
 
@@ -137,7 +139,8 @@ namespace Tachyon.Game.Rulesets.Beatmaps
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
                         Duration = endTimeData.Duration,
-                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4
+                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4,
+                        Row = 1
                     };
 
                     break;
@@ -151,6 +154,7 @@ namespace Tachyon.Game.Rulesets.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Type = isUpper ? NoteType.Upper : NoteType.Lower,
+                        Row = isUpper ? 0 : 1,
                         Samples = obj.Samples,
                     };
 

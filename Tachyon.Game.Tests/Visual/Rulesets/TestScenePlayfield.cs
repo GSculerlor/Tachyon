@@ -111,7 +111,7 @@ namespace Tachyon.Game.Tests.Visual.Rulesets
                     break;
 
                 case 6:
-                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TachyonPlayfield.DEFAULT_HEIGHT), 500);
+                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, Row.DEFAULT_HEIGHT), 500);
                     break;
             }
         }
