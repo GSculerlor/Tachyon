@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Rulesets.Scoring;
 using Tachyon.Game.Rulesets.UI;
 
 namespace Tachyon.Game.Rulesets
@@ -31,14 +32,14 @@ namespace Tachyon.Game.Rulesets
         /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap);
 
-        //TODO: Implement all of this components
-        /*/// <summary>
+        /// <summary>
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
         public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
 
-        /// <summary>
+        //TODO: Implement all of this components
+        /*/// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The health processor.</returns>

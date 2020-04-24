@@ -12,6 +12,7 @@ using osuTK.Input;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Rulesets;
+using Tachyon.Game.Rulesets.Scoring;
 using Tachyon.Game.Rulesets.UI;
 
 namespace Tachyon.Game.Screens.Play
@@ -21,10 +22,14 @@ namespace Tachyon.Game.Screens.Play
     {
         protected DrawableRuleset DrawableRuleset { get; private set; }
         
+        protected ScoreProcessor ScoreProcessor { get; private set; }
+        
         private RulesetInfo rulesetInfo;
         private Ruleset ruleset;
         
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
+        
+        protected HUDOverlay HUDOverlay { get; private set; }
         
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
@@ -48,6 +53,9 @@ namespace Tachyon.Game.Screens.Play
             
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap);
             
+            ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor.ApplyBeatmap(playableBeatmap);
+            
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
@@ -55,6 +63,19 @@ namespace Tachyon.Game.Screens.Play
             dependencies.CacheAs(gameplayBeatmap);
             
             addGameplayComponents(GameplayClockContainer);
+            addOverlayComponents(GameplayClockContainer);
+            
+            DrawableRuleset.OnNewResult += r =>
+            {
+                ScoreProcessor.ApplyResult(r);
+            };
+
+            DrawableRuleset.OnRevertResult += r =>
+            {
+                ScoreProcessor.RevertResult(r);
+            };
+            
+            ScoreProcessor.AllJudged += onCompletion;
         }
         
         private void addGameplayComponents(Container target)
@@ -64,6 +85,18 @@ namespace Tachyon.Game.Screens.Play
             target.AddRange(new Drawable[]
             {
                 DrawableRuleset
+            });
+        }
+
+        private void addOverlayComponents(Container target)
+        {
+            target.AddRange(new[]
+            {
+                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                }
             });
         }
             
@@ -130,6 +163,13 @@ namespace Tachyon.Game.Screens.Play
         
         public override bool OnExiting(IScreen next)
         {
+            if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
+            {
+                // proceed to result screen if beatmap already finished playing
+                completionProgressDelegate.RunTask();
+                return true;
+            }
+            
             // ValidForResume is false when restarting
             if (ValidForResume)
             {
@@ -154,6 +194,8 @@ namespace Tachyon.Game.Screens.Play
         
         private void performImmediateExit()
         {
+            completionProgressDelegate?.Cancel();
+            
             ValidForResume = false;
 
             performUserRequestedExit();
@@ -176,6 +218,32 @@ namespace Tachyon.Game.Screens.Play
                 performImmediateExit();
             else
                 this.MakeCurrent();
+        }
+        
+        private ScheduledDelegate completionProgressDelegate;
+
+        private void onCompletion()
+        {
+            Logger.Log("onCompletion is called");
+            
+            // screen may be in the exiting transition phase.
+            if (!this.IsCurrentScreen())
+                return;
+
+            // Only show the completion screen if the player hasn't failed
+            if (completionProgressDelegate != null)
+                return;
+
+            ValidForResume = false;
+
+            using (BeginDelayedSequence(1000))
+                scheduleToResult();
+        }
+        
+        private void scheduleToResult()
+        {
+            completionProgressDelegate?.Cancel();
+            completionProgressDelegate = Schedule(performUserRequestedExit);
         }
         
         protected override bool OnKeyDown(KeyDownEvent e)

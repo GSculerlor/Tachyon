@@ -104,7 +104,7 @@ namespace Tachyon.Game.Graphics
                 case HitResult.Perfect:
                     return Blue;
                 
-                case HitResult.Late:
+                case HitResult.Good:
                     return Yellow;
 
                 case HitResult.Miss:

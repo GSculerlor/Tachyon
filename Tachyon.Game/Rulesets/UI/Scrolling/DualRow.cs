@@ -10,7 +10,7 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
 {
     public class DualRow : ScrollingPlayfield
     {
-        public const float ROW_SPACING = 1;
+        public const float ROW_SPACING = 10;
         
         public IReadOnlyList<Row> Rows => rowFlow.Children;
         private readonly FillFlowContainer<Row> rowFlow;
@@ -45,7 +45,7 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
-                            Padding = new MarginPadding { Left = ROW_SPACING, Right = ROW_SPACING },
+                            Spacing = new Vector2(0, ROW_SPACING),
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }

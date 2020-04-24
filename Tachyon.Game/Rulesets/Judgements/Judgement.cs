@@ -65,7 +65,7 @@ using Tachyon.Game.Rulesets.Scoring;
                 case HitResult.Miss:
                     return -DEFAULT_MAX_HEALTH_INCREASE;
 
-                case HitResult.Late:
+                case HitResult.Good:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.Perfect:

@@ -11,7 +11,7 @@ namespace Tachyon.Game.Rulesets.Scoring
         private static readonly DifficultyRange[] tachyon_ranges =
         {
             new DifficultyRange(HitResult.Perfect, 50, 35, 20),
-            new DifficultyRange(HitResult.Late, 120, 80, 50),
+            new DifficultyRange(HitResult.Good, 120, 80, 50),
             new DifficultyRange(HitResult.Miss, 135, 95, 70),
         };
         
@@ -29,7 +29,7 @@ namespace Tachyon.Game.Rulesets.Scoring
         
         protected HitResult LowestSuccessfulHitResult()
         {
-            for (var result = HitResult.Late; result <= HitResult.Perfect; ++result)
+            for (var result = HitResult.Good; result <= HitResult.Perfect; ++result)
             {
                 if (IsHitResultAllowed(result))
                     return result;
@@ -40,7 +40,7 @@ namespace Tachyon.Game.Rulesets.Scoring
         
         public IEnumerable<(HitResult result, double length)> GetAllAvailableWindows()
         {
-            for (var result = HitResult.Late; result <= HitResult.Perfect; ++result)
+            for (var result = HitResult.Good; result <= HitResult.Perfect; ++result)
             {
                 if (IsHitResultAllowed(result))
                     yield return (result, WindowFor(result));
@@ -52,7 +52,7 @@ namespace Tachyon.Game.Rulesets.Scoring
             switch (result)
             {
                 case HitResult.Perfect:
-                case HitResult.Late:
+                case HitResult.Good:
                 case HitResult.Miss:
                     return true;
             }
@@ -72,7 +72,7 @@ namespace Tachyon.Game.Rulesets.Scoring
                         miss = value;
                         break;
                     
-                    case HitResult.Late:
+                    case HitResult.Good:
                         late = value;
                         break;
 
@@ -103,7 +103,7 @@ namespace Tachyon.Game.Rulesets.Scoring
                 case HitResult.Perfect:
                     return perfect;
 
-                case HitResult.Late:
+                case HitResult.Good:
                     return late;
 
                 case HitResult.Miss:

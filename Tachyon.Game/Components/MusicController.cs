@@ -3,6 +3,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using Tachyon.Game.Beatmaps;
 
 namespace Tachyon.Game.Components
@@ -11,46 +13,7 @@ namespace Tachyon.Game.Components
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-        
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-        
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
-        
-        public event Action<WorkingBeatmap, TrackChangeDirection> TrackChanged;
-        
-        public bool IsPaused { get; private set; }
-        
-        private WorkingBeatmap currentBeatmap;
-        private TrackChangeDirection? queuedDirection;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            beatmaps.ItemAdded += handleBeatmapAdded;
-            beatmaps.ItemRemoved += handleBeatmapRemoved;
-            
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets());
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            beatmap.BindValueChanged(beatmapChanged, true);
-        }
-        
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= handleBeatmapAdded;
-                beatmaps.ItemRemoved -= handleBeatmapRemoved;
-            }
-        }
-        
         public IBindableList<BeatmapSetInfo> BeatmapSets
         {
             get
@@ -62,6 +25,51 @@ namespace Tachyon.Game.Components
             }
         }
 
+        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+
+        public bool IsUserPaused { get; private set; }
+
+        /// <summary>
+        /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
+        /// Includes direction information for display purposes.
+        /// </summary>
+        public event Action<WorkingBeatmap, TrackChangeDirection> TrackChanged;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            beatmaps.ItemAdded += handleBeatmapAdded;
+            beatmaps.ItemRemoved += handleBeatmapRemoved;
+
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmap.BindValueChanged(beatmapChanged, true);
+        }
+
+        /// <summary>
+        /// Change the position of a <see cref="BeatmapSetInfo"/> in the current playlist.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The beatmap to move.</param>
+        /// <param name="index">The new position.</param>
+        public void ChangeBeatmapSetPosition(BeatmapSetInfo beatmapSetInfo, int index)
+        {
+            beatmapSets.Remove(beatmapSetInfo);
+            beatmapSets.Insert(index, beatmapSetInfo);
+        }
+
+        /// <summary>
+        /// Returns whether the current beatmap track is playing.
+        /// </summary>
+        public bool IsPlaying => current?.Track.IsRunning ?? false;
+
         private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() =>
         {
             if (!beatmapSets.Contains(set))
@@ -72,46 +80,28 @@ namespace Tachyon.Game.Components
         {
             beatmapSets.RemoveAll(s => s.ID == set.ID);
         });
-        
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+
+        private ScheduledDelegate seekDelegate;
+
+        public void SeekTo(double position)
         {
-            TrackChangeDirection direction = TrackChangeDirection.None;
-
-            if (currentBeatmap != null)
+            seekDelegate?.Cancel();
+            seekDelegate = Schedule(() =>
             {
-                bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(currentBeatmap.BeatmapInfo) ?? false;
-
-                if (audioEquals)
-                    direction = TrackChangeDirection.None;
-                else if (queuedDirection.HasValue)
-                {
-                    direction = queuedDirection.Value;
-                    queuedDirection = null;
-                }
-                else
-                {
-                    //figure out the best direction based on order in playlist.
-                    var last = BeatmapSets.TakeWhile(b => b.ID != currentBeatmap.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
-
-                    direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
-                }
-            }
-
-            currentBeatmap = beatmap.NewValue;
-            TrackChanged?.Invoke(currentBeatmap, direction);
-            queuedDirection = null;
+                if (!beatmap.Disabled)
+                    current?.Track.Seek(position);
+            });
         }
-        
-        #region Controller
-        
-        public bool IsPlaying => currentBeatmap?.Track.IsRunning ?? false;
-        
+
+        /// <summary>
+        /// Start playing the current track (if not already playing).
+        /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool Play(bool restart = false)
         {
-            var track = currentBeatmap?.Track;
+            var track = current?.Track;
 
-            IsPaused = false;
+            IsUserPaused = false;
 
             if (track == null)
             {
@@ -129,19 +119,26 @@ namespace Tachyon.Game.Components
 
             return true;
         }
-        
+
+        /// <summary>
+        /// Stop playing the current track and pause at the current position.
+        /// </summary>
         public void Stop()
         {
-            var track = currentBeatmap?.Track;
+            var track = current?.Track;
 
-            IsPaused = true;
+            IsUserPaused = true;
             if (track?.IsRunning == true)
                 track.Stop();
         }
-        
+
+        /// <summary>
+        /// Toggle pause / play.
+        /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
-            var track = currentBeatmap?.Track;
+            var track = current?.Track;
 
             if (track?.IsRunning == true)
                 Stop();
@@ -150,7 +147,33 @@ namespace Tachyon.Game.Components
 
             return true;
         }
-        
+
+        /// <summary>
+        /// Play the previous track.
+        /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
+        public bool PreviousTrack()
+        {
+            queuedDirection = TrackChangeDirection.Prev;
+
+            var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
+
+            if (playable != null)
+            {
+                if (beatmap is Bindable<WorkingBeatmap> working)
+                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
+                beatmap.Value.Track.Restart();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Play the next random or playlist track.
+        /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
         public bool NextTrack() => next();
 
         private bool next(bool instant = false)
@@ -158,7 +181,7 @@ namespace Tachyon.Game.Components
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => i.ID != currentBeatmap.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -170,32 +193,87 @@ namespace Tachyon.Game.Components
 
             return false;
         }
-        
-        public bool PrevTrack()
+
+        private WorkingBeatmap current;
+
+        private TrackChangeDirection? queuedDirection;
+
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            queuedDirection = TrackChangeDirection.Prev;
+            TrackChangeDirection direction = TrackChangeDirection.None;
 
-            var playable = BeatmapSets.TakeWhile(i => i.ID != currentBeatmap.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
-
-            if (playable != null)
+            if (current != null)
             {
-                if (beatmap is Bindable<WorkingBeatmap> working)
-                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-                beatmap.Value.Track.Restart();
+                bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
-                return true;
+                if (audioEquals)
+                    direction = TrackChangeDirection.None;
+                else if (queuedDirection.HasValue)
+                {
+                    direction = queuedDirection.Value;
+                    queuedDirection = null;
+                }
+                else
+                {
+                    //figure out the best direction based on order in playlist.
+                    var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+
+                    direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
+                }
             }
 
-            return false;
+            current = beatmap.NewValue;
+            TrackChanged?.Invoke(current, direction);
+
+            ResetTrackAdjustments();
+
+            queuedDirection = null;
         }
-        
-        #endregion
-        
-        public enum TrackChangeDirection
+
+        private bool allowRateAdjustments;
+
+        /// <summary>
+        /// Whether mod rate adjustments are allowed to be applied.
+        /// </summary>
+        public bool AllowRateAdjustments
         {
-            None,
-            Next,
-            Prev
+            get => allowRateAdjustments;
+            set
+            {
+                if (allowRateAdjustments == value)
+                    return;
+
+                allowRateAdjustments = value;
+                ResetTrackAdjustments();
+            }
         }
+
+        public void ResetTrackAdjustments()
+        {
+            var track = current?.Track;
+            if (track == null)
+                return;
+
+            track.ResetSpeedAdjustments();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= handleBeatmapAdded;
+                beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            }
+        }
+    }
+    
+    public enum TrackChangeDirection
+    {
+        None,
+        Next,
+        Prev
     }
 }

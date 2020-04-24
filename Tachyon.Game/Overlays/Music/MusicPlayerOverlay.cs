@@ -120,7 +120,7 @@ namespace Tachyon.Game.Overlays.Music
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Left = 10 },
                                     Icon = FontAwesome.Solid.ChevronLeft,
-                                    Action = () => musicController.PrevTrack()
+                                    Action = () => musicController.PreviousTrack()
                                 },
                                 new MusicControllerButton
                                 {
@@ -185,7 +185,7 @@ namespace Tachyon.Game.Overlays.Music
             this.ScaleTo(0.9f, 400, Easing.OutQuint);
         }
         
-        private void trackChanged(WorkingBeatmap beatmap, MusicController.TrackChangeDirection direction = MusicController.TrackChangeDirection.None)
+        private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
             pendingBeatmapSwitch = delegate
             {

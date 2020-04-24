@@ -10,8 +10,8 @@ namespace Tachyon.Game.Rulesets.Scoring
         [Description(@"Miss")]
         Miss,
 
-        [Description(@"Late")]
-        Late,
+        [Description(@"Good")]
+        Good,
 
         [Description(@"Perfect")]
         Perfect,

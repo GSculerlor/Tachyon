@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Rulesets.Beatmaps;
+using Tachyon.Game.Rulesets.Scoring;
 using Tachyon.Game.Rulesets.UI;
 using Tachyon.Game.Rulesets.UI.Scrolling;
 
@@ -29,5 +30,7 @@ namespace Tachyon.Game.Rulesets
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap) => new DrawableTachyonRuleset(this, beatmap);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TachyonBeatmapConverter(beatmap, this);
+
+        public override ScoreProcessor CreateScoreProcessor() => new TachyonScoreProcessor();
     }
 }

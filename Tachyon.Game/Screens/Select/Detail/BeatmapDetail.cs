@@ -1,10 +1,12 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osuTK.Graphics;
@@ -21,6 +23,8 @@ namespace Tachyon.Game.Screens.Select.Detail
         private BeatmapDetailContent loadingDetailContent;
         
         private WorkingBeatmap beatmap;
+
+        public Action ClickedAction;
 
         public WorkingBeatmap Beatmap
         {
@@ -89,6 +93,13 @@ namespace Tachyon.Game.Screens.Select.Detail
                 removeOldInfo();
                 Add(DetailContent = loaded);
             });
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            ClickedAction?.Invoke();
+            
+            return true;
         }
 
         public class BeatmapDetailContent : BufferedContainer
