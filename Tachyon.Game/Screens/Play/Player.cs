@@ -14,6 +14,8 @@ using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Rulesets;
 using Tachyon.Game.Rulesets.Scoring;
 using Tachyon.Game.Rulesets.UI;
+using Tachyon.Game.Scoring;
+using Tachyon.Game.Screens.Result;
 
 namespace Tachyon.Game.Screens.Play
 {
@@ -85,6 +87,11 @@ namespace Tachyon.Game.Screens.Play
             target.AddRange(new Drawable[]
             {
                 DrawableRuleset
+            });
+            
+            DrawableRuleset.FrameStableComponents.AddRange(new Drawable[]
+            {
+                ScoreProcessor
             });
         }
 
@@ -243,7 +250,24 @@ namespace Tachyon.Game.Screens.Play
         private void scheduleToResult()
         {
             completionProgressDelegate?.Cancel();
-            completionProgressDelegate = Schedule(performUserRequestedExit);
+            completionProgressDelegate = Schedule(gotoResult);
+        }
+
+        private void gotoResult()
+        {
+            this.Push(new ResultScreen(createScore()));
+        }
+        
+        private ScoreInfo createScore()
+        {
+            var score = new ScoreInfo
+            {
+                Beatmap = Beatmap.Value.BeatmapInfo
+            };
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
         }
         
         protected override bool OnKeyDown(KeyDownEvent e)

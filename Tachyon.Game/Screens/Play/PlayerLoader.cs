@@ -13,6 +13,7 @@ namespace Tachyon.Game.Screens.Play
 {
     public class PlayerLoader : DimmedBackgroundScreen
     {
+        public override bool DisallowExternalBeatmapChanges => true;
         protected Task LoadTask { get; private set; }
 
         protected Task DisposalTask { get; private set; }

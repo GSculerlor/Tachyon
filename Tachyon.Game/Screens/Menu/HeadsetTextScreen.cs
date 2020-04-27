@@ -50,10 +50,6 @@ namespace Tachyon.Game.Screens.Menu
         
         public override bool AllowBackButton => false;
 
-        public override bool ToolbarVisible => false;
-
-        public override bool CursorVisible => false;
-        
         protected override void LoadComplete()
         {
             base.LoadComplete();

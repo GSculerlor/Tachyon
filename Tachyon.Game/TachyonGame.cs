@@ -8,25 +8,30 @@ using osu.Framework.Configuration;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics.Containers;
+using Tachyon.Game.Graphics.UserInterface;
+using Tachyon.Game.Input;
 using Tachyon.Game.Overlays.Music;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
 namespace Tachyon.Game
 {
-    public class TachyonGame : TachyonGameBase
+    public class TachyonGame : TachyonGameBase, IKeyBindingHandler<GlobalAction>
     {
         private TachyonScreenStack screenStack;
         private IntroScreen introScreen;
         private DependencyContainer dependencies;
         private Container rightFloatingOverlayContent;
         private MusicController musicController;
+        
+        protected BackButton BackButton;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
         
@@ -50,6 +55,8 @@ namespace Tachyon.Game
         {
             base.LoadComplete();
 
+            BackButton.Receptor receptor;
+            
             AddRange(new Drawable[]
             {
                 new ScalingContainer
@@ -57,7 +64,18 @@ namespace Tachyon.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        receptor = new BackButton.Receptor(),
                         screenStack = new TachyonScreenStack { RelativeSizeAxes = Axes.Both },
+                        BackButton = new BackButton(receptor)
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Action = () =>
+                            {
+                                if ((screenStack.CurrentScreen as TachyonScreen)?.AllowBackButton == true)
+                                    screenStack.Exit();
+                            }
+                        },
                     }
                 },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -185,7 +203,10 @@ namespace Tachyon.Game
 
             if (newScreen is ITachyonScreen newTachyonScreen)
             {
-                
+                if (newTachyonScreen.AllowBackButton)
+                    BackButton.Show();
+                else
+                    BackButton.Hide();
             }
         }
 
@@ -202,6 +223,17 @@ namespace Tachyon.Game
 
             if (newScreen == null)
                 Exit();
+        }
+        
+        public bool OnPressed(GlobalAction action)
+        {
+            if (introScreen == null) return false;
+
+            return false;
+        }
+        
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿
+﻿using System.ComponentModel;
 
-using System.ComponentModel;
-
-namespace Tachyon.Game.Rulesets.Scoring
+namespace Tachyon.Game.Scoring
 {
     public enum ScoreRank
     {

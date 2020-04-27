@@ -59,7 +59,7 @@ namespace Tachyon.Game.Beatmaps
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}] - {OnlineBeatmapID}".Trim();
+        public override string ToString() => $"{Metadata} [{Version}]".Trim();
         
         [JsonIgnore]
         public BeatmapDifficultyRating BeatmapDifficultyRating

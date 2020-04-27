@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
@@ -106,8 +107,16 @@ namespace Tachyon.Game
             dependencies.CacheAs(Beatmap);
             
             FileStore.Cleanup();
+            
+            GlobalActionContainer globalBinding = new GlobalActionContainer(this)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
 
-            base.Content.Add(CreateScalingContainer());
+            base.Content.Add(CreateScalingContainer().WithChild(globalBinding));
+
+            KeyBindingStore.Register(globalBinding);
+            dependencies.Cache(globalBinding);
         }
         
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();

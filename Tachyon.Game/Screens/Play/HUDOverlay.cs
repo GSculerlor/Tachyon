@@ -16,6 +16,7 @@ namespace Tachyon.Game.Screens.Play
         public readonly BeatmapProgress Progress;
         public readonly RollingCounter<int> ComboCounter;
         public readonly RollingCounter<double> ScoreCounter;
+        public readonly BeatmapTitle Title;
         
         private readonly DrawableRuleset drawableRuleset;
         private readonly ScoreProcessor scoreProcessor;
@@ -82,6 +83,12 @@ namespace Tachyon.Game.Screens.Play
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
                             RelativeSizeAxes = Axes.X,
+                        },
+                        Title = new BeatmapTitle
+                        {
+                            Margin = new MarginPadding { Left = 20, Bottom = 8},
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                         }
                     }
                 }

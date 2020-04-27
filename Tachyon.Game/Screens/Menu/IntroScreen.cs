@@ -110,8 +110,6 @@ namespace Tachyon.Game.Screens.Menu
         
         public override bool AllowBackButton => false;
 
-        public override bool ToolbarVisible => false;
-        
         private void prepareMainMenu() => LoadComponentAsync(songSelection = new TachyonSongSelect());
         
         protected override BackgroundScreen CreateBackground() => new TextureBackgroundScreen();

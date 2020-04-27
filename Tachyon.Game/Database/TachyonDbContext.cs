@@ -7,7 +7,8 @@ using osu.Framework.Statistics;
 using Tachyon.Game.Beatmaps;
  using Tachyon.Game.Input.Bindings;
  using Tachyon.Game.IO;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+ using Tachyon.Game.Scoring;
+ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Tachyon.Game.Database
 {
@@ -19,6 +20,7 @@ namespace Tachyon.Game.Database
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
+        public DbSet<ScoreInfo> ScoreInfo { get; set; }
 
         private readonly string connectionString;
 
@@ -117,6 +119,8 @@ namespace Tachyon.Game.Database
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+            
+            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.Hash).IsUnique();
         }
 
         private class TachyonDbLoggerFactory : ILoggerFactory

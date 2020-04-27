@@ -32,7 +32,7 @@ namespace Tachyon.Game.Beatmaps
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
-        public override string ToString() => $"{Artist} - {Title})";
+        public override string ToString() => $"{Artist} - {Title}";
 
         [JsonIgnore]
         public string[] SearchableTerms => new[]

@@ -15,7 +15,7 @@ using Tachyon.Game.Graphics;
         private Background background;
         private readonly string backgroundName;
 
-        public TextureBackgroundScreen([CanBeNull] string backgroundName = @"Characters/Exusiai_1")
+        public TextureBackgroundScreen([CanBeNull] string backgroundName = @"Backgrounds/background_unbecoming")
         {
             this.backgroundName = backgroundName;
         }

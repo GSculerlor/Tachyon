@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using Tachyon.Game.Rulesets.Judgements;
+using Tachyon.Game.Scoring;
 
 namespace Tachyon.Game.Rulesets.Scoring
 {
@@ -183,6 +185,24 @@ namespace Tachyon.Game.Rulesets.Scoring
             Combo.Value = 0;
             Rank.Value = ScoreRank.S;
             HighestCombo.Value = 0;
+        }
+        
+        /// <summary>
+        /// Retrieve a score populated with data for the current play this processor is responsible for.
+        /// </summary>
+        public void PopulateScore(ScoreInfo score)
+        {
+            score.TotalScore = (long)Math.Round(TotalScore.Value);
+            score.Combo = Combo.Value;
+            score.MaxCombo = HighestCombo.Value;
+            score.Accuracy = Math.Round(Accuracy.Value, 4);
+            score.Rank = Rank.Value;
+            score.Date = DateTimeOffset.Now;
+
+            var hitWindows = CreateHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+                score.Statistics[result] = GetStatistic(result);
         }
 
         /// <summary>

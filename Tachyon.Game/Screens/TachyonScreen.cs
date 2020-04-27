@@ -1,30 +1,36 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Internal;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using Tachyon.Game.Beatmaps;
 
- namespace Tachyon.Game.Screens
+namespace Tachyon.Game.Screens
 {
     public abstract class TachyonScreen : Screen, ITachyonScreen
     {
-        public virtual bool AllowBackButton => true;
-        
-        public virtual bool ToolbarVisible => true;
-        
-        public bool AllowExternalScreenChange => false;
+        /// <summary>
+        /// A user-facing title for this screen.
+        /// </summary>
+        public virtual string Title => GetType().ShortDisplayName();
 
-        public virtual bool CursorVisible => true;
+        public string Description => Title;
+
+        public virtual bool AllowBackButton => true;
+
+        public virtual bool AllowExternalScreenChange => false;
+        
+        public virtual bool DisallowExternalBeatmapChanges => false;
+        
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
         private BackgroundScreen localBackground;
-        private TachyonScreenDependencies screenDependencies;
 
         [Resolved(canBeNull: true)]
         private BackgroundScreenStack backgroundStack { get; set; }
-        
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         
         protected TachyonScreen()
@@ -33,12 +39,17 @@ using Tachyon.Game.Beatmaps;
             Origin = Anchor.Centre;
         }
 
+        private TachyonScreenDependencies screenDependencies;
+
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             if (screenDependencies == null)
             {
+                if (DisallowExternalBeatmapChanges)
+                    throw new InvalidOperationException($"Screens that specify {nameof(DisallowExternalBeatmapChanges)} must be pushed immediately.");
+
                 createDependencies(parent);
             }
 
@@ -47,7 +58,7 @@ using Tachyon.Game.Beatmaps;
 
         private void createDependencies(IReadOnlyDependencyContainer dependencies)
         {
-            screenDependencies = new TachyonScreenDependencies(false, dependencies);
+            screenDependencies = new TachyonScreenDependencies(DisallowExternalBeatmapChanges, dependencies);
 
             Beatmap = screenDependencies.Beatmap;
         }
