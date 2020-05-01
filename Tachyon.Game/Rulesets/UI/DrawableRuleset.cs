@@ -172,6 +172,15 @@ namespace Tachyon.Game.Rulesets.UI
 
             Playfield.PostProcess();
         }
+        
+        public override void RequestResume(Action continueResume)
+        {
+            continueResume();
+        }
+
+        public override void CancelResume()
+        {
+        }
 
         /// <summary>
         /// Creates and adds the visual representation of a <typeparamref name="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
@@ -278,6 +287,7 @@ namespace Tachyon.Game.Rulesets.UI
         /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
         /// </summary>
         public abstract double GameplayStartTime { get; }
+        
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
@@ -302,6 +312,19 @@ namespace Tachyon.Game.Rulesets.UI
                 return null;
             }
         }
+        
+        /// <summary>
+        /// Invoked when the interactive user requests resuming from a paused state.
+        /// Allows potentially delaying the resume process until an interaction is performed.
+        /// </summary>
+        /// <param name="continueResume">The action to run when resuming is to be completed.</param>
+        public abstract void RequestResume(Action continueResume);
+
+        /// <summary>
+        /// Invoked when the user requests to pause while the resume overlay is active.
+        /// </summary>
+        public abstract void CancelResume();
+        
     }
     
     public class BeatmapInvalidForRulesetException : ArgumentException

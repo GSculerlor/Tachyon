@@ -4,7 +4,7 @@ namespace Tachyon.Game.Rulesets.Judgements
 {
     public class HoldNoteJudgement : Judgement
     {
-        public override bool AffectsCombo => false;
+        public override bool AffectsCombo => true;
 
         protected override double HealthIncreaseFor(HitResult result)
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ManagedBass.Fx;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using Tachyon.Game.Rulesets.Judgements;

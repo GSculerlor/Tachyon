@@ -297,7 +297,7 @@ namespace Tachyon.Game.Database
                 Delete(b);
             }
         }
-        
+
         public void Undelete(List<TModel> items)
         {
             if (!items.Any()) return;

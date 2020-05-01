@@ -37,17 +37,18 @@ namespace Tachyon.Game.Screens.Select.Detail
                 updateDetail();
             }
         }
-        
-        public BeatmapDetail()
+
+        [BackgroundDependencyLoader]
+        private void load(TachyonColor colors)
         {
             Masking = true;
-            BorderColour = new Color4(221, 255, 255, 255);
+            BorderColour = colors.Blue;
             Alpha = 0;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
+                Colour = colors.BlueLighter,
+                Radius = 10,
             };
         }
         
@@ -156,27 +157,27 @@ namespace Tachyon.Game.Screens.Select.Detail
                     },
                     new FillFlowContainer
                     {
-                        Name = "Bottom-aligned metadata",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         Y = -7,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Left = 25, Bottom = 25 },
+                        Padding = new MarginPadding { Left = 50 },
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             TitleLabel = new TachyonSpriteText
                             {
-                                Font = TachyonFont.GetFont(size: 28, weight: FontWeight.Bold),
+                                Font = TachyonFont.GetFont(size: 30, weight: FontWeight.Bold),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
                             },
                             ArtistLabel = new TachyonSpriteText
                             {
-                                Font = TachyonFont.GetFont(size: 20, weight: FontWeight.SemiBold),
+                                Font = TachyonFont.GetFont(size: 24, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
+                                Margin = new MarginPadding { Bottom = 16 }
                             },
                             new TachyonSpriteText
                             {

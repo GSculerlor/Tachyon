@@ -28,7 +28,6 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
         public readonly int Index;
         
         private readonly JudgementContainer<DrawableTachyonJudgement> judgementContainer;
-        private readonly HitTarget hitTarget;
 
         private readonly ProxyContainer topLevelHitContainer;
         
@@ -72,7 +71,7 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                hitTarget = new HitTarget
+                                new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,

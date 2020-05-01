@@ -28,14 +28,9 @@ namespace Tachyon.Game.Rulesets.Objects
         public int TickRate = 1;
 
         /// <summary>
-        /// Number of drum roll ticks required for a "Good" hit.
+        /// Number of drum roll ticks required for a "Perfect" hit.
         /// </summary>
-        public double RequiredGoodHits { get; protected set; }
-
-        /// <summary>
-        /// Number of drum roll ticks required for a "Great" hit.
-        /// </summary>
-        public double RequiredGreatHits { get; protected set; }
+        public double RequiredPerfectHits { get; protected set; }
 
         /// <summary>
         /// The length (in milliseconds) between ticks of this drumroll.
@@ -59,8 +54,7 @@ namespace Tachyon.Game.Rulesets.Objects
         {
             createTicks();
 
-            RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
-            RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+            RequiredPerfectHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
 
             base.CreateNestedHitObjects();
         }

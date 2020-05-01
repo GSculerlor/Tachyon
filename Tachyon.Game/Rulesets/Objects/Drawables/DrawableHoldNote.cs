@@ -106,8 +106,8 @@ namespace Tachyon.Game.Rulesets.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
-            if (countHit >= HitObject.RequiredGoodHits)
-                ApplyResult(r => r.Type = HitResult.Good);
+            if (countHit >= HitObject.RequiredPerfectHits)
+                ApplyResult(r => r.Type = HitResult.Perfect);
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
         }

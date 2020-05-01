@@ -18,6 +18,7 @@ using Tachyon.Game.Database;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Input;
 using Tachyon.Game.IO;
+using Tachyon.Game.Scoring;
 
 namespace Tachyon.Game
 {
@@ -32,6 +33,7 @@ namespace Tachyon.Game
         
         protected FileStore FileStore;
         protected BeatmapManager BeatmapManager;
+        protected ScoreManager ScoreManager;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -90,10 +92,21 @@ namespace Tachyon.Game
             var defaultBeatmap = new PlaceholderWorkingBeatmap(Audio, Textures);
             
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory));
+            
+            dependencies.Cache(ScoreManager = new ScoreManager(() => BeatmapManager, Storage, contextFactory, Host));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, Audio, Host, defaultBeatmap));
             dependencies.Cache(new TachyonColor());
             
             fileImporters.Add(BeatmapManager);
+            
+            List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
+            {
+                var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
+                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
+            }
+
+            BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
+            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i));
             
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             

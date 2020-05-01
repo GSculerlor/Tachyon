@@ -16,6 +16,7 @@ namespace Tachyon.Game.Screens.Play
         public readonly BeatmapProgress Progress;
         public readonly RollingCounter<int> ComboCounter;
         public readonly RollingCounter<double> ScoreCounter;
+        public readonly PauseButton Pause;
         public readonly BeatmapTitle Title;
         
         private readonly DrawableRuleset drawableRuleset;
@@ -44,11 +45,12 @@ namespace Tachyon.Game.Screens.Play
                             RelativeSizeAxes = Axes.X,
                             Children = new Drawable[]
                             {
-                                ScoreCounter = new ScoreCounter
+                                Pause = new PauseButton
                                 {
-                                    TextSize = 24,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    AutoSizeAxes = Axes.X,
+                                    Height = 24,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
                                     Margin = new MarginPadding { Top = 25, Horizontal = 20 }
                                 },
                                 new FillFlowContainer
@@ -75,7 +77,14 @@ namespace Tachyon.Game.Screens.Play
                                             Margin = new MarginPadding { Top = 8 }
                                         }
                                     }
-                                }
+                                },
+                                ScoreCounter = new ScoreCounter
+                                {
+                                    TextSize = 24,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Margin = new MarginPadding { Top = 25, Horizontal = 20 }
+                                },
                             },
                         },
                         Progress = new BeatmapProgress

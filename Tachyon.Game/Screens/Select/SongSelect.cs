@@ -10,10 +10,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Scoring;
 using Tachyon.Game.Screens.Backgrounds;
 using Tachyon.Game.Screens.Select.Detail;
 
@@ -26,9 +28,14 @@ namespace Tachyon.Game.Screens.Select
         protected BeatmapCarousel Carousel { get; private set; }
 
         private BeatmapDetail beatmapDetail;
+
+        private HighscoreDetail highscoreDetail;
         
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+        
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
         
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
@@ -54,17 +61,20 @@ namespace Tachyon.Game.Screens.Select
                             {
                                 new Drawable[]
                                 {
-                                    new Container
+                                    new FillFlowContainer
                                     {
-                                        Origin = Anchor.BottomLeft,
-                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
                                         RelativeSizeAxes = Axes.Both,
-
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 16),
                                         Children = new Drawable[]
                                         {
                                             beatmapDetail = new BeatmapDetail
                                             {
-                                                Height = 240,
+                                                Origin = Anchor.Centre,
+                                                Anchor = Anchor.Centre,
+                                                Height = 200,
                                                 RelativeSizeAxes = Axes.X,
                                                 Margin = new MarginPadding
                                                 {
@@ -72,7 +82,14 @@ namespace Tachyon.Game.Screens.Select
                                                     Right = 40,
                                                 },
                                                 ClickedAction = () => FinaliseSelection()
-                                            }
+                                            },
+                                            highscoreDetail = new HighscoreDetail
+                                            {
+                                                Origin = Anchor.Centre,
+                                                Anchor = Anchor.Centre,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                            },
                                         }
                                     },
                                     new Container
@@ -109,19 +126,11 @@ namespace Tachyon.Game.Screens.Select
             return dependencies;
         }
         
-        /// <summary>
-        /// Call to make a selection and perform the default action for this SongSelect.
-        /// </summary>
-        /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
-            // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
                 return;
 
-            // avoid attempting to continue before a selection has been obtained.
-            // this could happen via a user interaction while the carousel is still in a loading state.
             if (Carousel.SelectedBeatmap == null) return;
 
             if (beatmap != null)
@@ -130,7 +139,7 @@ namespace Tachyon.Game.Screens.Select
             if (selectionChangedDebounce?.Completed == false)
             {
                 selectionChangedDebounce.RunTask();
-                selectionChangedDebounce.Cancel(); // cancel the already scheduled task.
+                selectionChangedDebounce.Cancel();
                 selectionChangedDebounce = null;
             }
 
@@ -138,10 +147,6 @@ namespace Tachyon.Game.Screens.Select
                 Carousel.AllowSelection = false;
         }
         
-        /// <summary>
-        /// Called when a selection is made.
-        /// </summary>
-        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
         protected abstract bool OnStart();
 
         private ScheduledDelegate selectionChangedDebounce;
@@ -158,7 +163,6 @@ namespace Tachyon.Game.Screens.Select
             }
         }
         
-        // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
         private BeatmapInfo beatmapNoDebounce;
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
@@ -171,9 +175,6 @@ namespace Tachyon.Game.Screens.Select
             performUpdateSelected();
         }
 
-        /// <summary>
-        /// selection has been changed as the result of a user interaction.
-        /// </summary>
         private void performUpdateSelected()
         {
             var beatmap = beatmapNoDebounce;
@@ -189,8 +190,6 @@ namespace Tachyon.Game.Screens.Select
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"}");
 
-                // We may be arriving here due to another component changing the bindable Beatmap.
-                // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
@@ -225,7 +224,6 @@ namespace Tachyon.Game.Screens.Select
             {
                 updateComponentFromBeatmap(Beatmap.Value);
 
-                // restart playback on returning to song select, regardless.
                 music?.Play();
             }
 
@@ -249,7 +247,8 @@ namespace Tachyon.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            //beatmapDetail.Hide();
+            beatmapDetail.Hide();
+            highscoreDetail.Hide();
 
             this.FadeOut(100);
 
@@ -259,11 +258,6 @@ namespace Tachyon.Game.Screens.Select
             return false;
         }
 
-        /// <summary>
-        /// Allow components in SongSelect to update their loaded beatmap details.
-        /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
-        /// </summary>
-        /// <param name="beatmap">The working beatmap.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             if (Background is BeatmapBackgroundScreen backgroundModeBeatmap)
@@ -271,8 +265,14 @@ namespace Tachyon.Game.Screens.Select
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
+            
+            var queriedScore = scoreManager
+                               .QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.BeatmapInfo.ID)
+                               .OrderByDescending(s => s.TotalScore)
+                               .FirstOrDefault();
 
             beatmapDetail.Beatmap = beatmap;
+            highscoreDetail.Score.Value = queriedScore;
 
             if (beatmap.Track != null)
                 beatmap.Track.Looping = true;
@@ -280,10 +280,6 @@ namespace Tachyon.Game.Screens.Select
 
         private readonly WeakReference<Track> lastTrack = new WeakReference<Track>(null);
 
-        /// <summary>
-        /// Ensures some music is playing for the current track.
-        /// Will resume playback from a manual user pause if the track has changed.
-        /// </summary>
         private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
@@ -304,17 +300,14 @@ namespace Tachyon.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            // If a selection was already obtained, do not attempt to update the selected beatmap.
             if (Carousel.SelectedBeatmapSet != null)
                 return;
 
-            // Attempt to select the current beatmap on the carousel, if it is valid to be selected.
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
             {
                 if (Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                     return;
 
-                // prefer not changing ruleset at this point, so look for another difficulty in the currently playing beatmap
                 var found = Beatmap.Value.BeatmapSetInfo.Beatmaps.FirstOrDefault();
 
                 if (found != null && Carousel.SelectBeatmap(found, false))
@@ -333,7 +326,7 @@ namespace Tachyon.Game.Screens.Select
 
             boundLocalBindables = true;
         }
-        
+
         private class VerticalMaskingContainer : Container
         {
             private const float panel_overflow = 1.2f;

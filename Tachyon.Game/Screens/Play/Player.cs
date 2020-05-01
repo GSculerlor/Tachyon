@@ -29,15 +29,21 @@ namespace Tachyon.Game.Screens.Play
         private RulesetInfo rulesetInfo;
         private Ruleset ruleset;
         
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+        
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
         
         protected HUDOverlay HUDOverlay { get; private set; }
+        
+        protected PauseOverlay PauseOverlay { get; private set; }
         
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
         private GameplayBeatmap gameplayBeatmap;
         
         private DependencyContainer dependencies;
+        public Action RestartRequested;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -97,13 +103,24 @@ namespace Tachyon.Game.Screens.Play
 
         private void addOverlayComponents(Container target)
         {
-            target.AddRange(new[]
+            target.AddRange(new Drawable[]
             {
                 HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset)
                 {
+                    Pause =
+                    {
+                        Action = performUserRequestedExit,
+                        IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                    },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
-                }
+                },
+                PauseOverlay = new PauseOverlay
+                {
+                    OnResume = Resume,
+                    OnRetry = Restart,
+                    OnQuit = performUserRequestedExit,
+                },
             });
         }
             
@@ -142,6 +159,57 @@ namespace Tachyon.Game.Screens.Play
             }
 
             return playable;
+        }
+        
+        public bool IsResuming { get; private set; }
+
+        private const double pause_cooldown = 1000;
+
+        private double? lastPauseActionTime;
+
+        private bool canPause =>
+            LoadedBeatmapSuccessfully && ValidForResume
+            // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
+            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
+
+        private bool pauseCooldownActive =>
+            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
+
+        private bool canResume =>
+            // cannot resume from a non-paused state
+            GameplayClockContainer.IsPaused.Value
+            // already resuming
+            && !IsResuming;
+
+        public void Pause()
+        {
+            if (!canPause) return;
+
+            if (IsResuming)
+            {
+                DrawableRuleset.CancelResume();
+                IsResuming = false;
+            }
+
+            GameplayClockContainer.Stop();
+            PauseOverlay.Show();
+            lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+        }
+
+        public void Resume()
+        {
+            if (!canResume) return;
+
+            IsResuming = true;
+            PauseOverlay.Hide();
+
+            DrawableRuleset.RequestResume(completeResume);
+
+            void completeResume()
+            {
+                GameplayClockContainer.Start();
+                IsResuming = false;
+            }
         }
         
         public override void OnEntering(IScreen last)
@@ -184,6 +252,12 @@ namespace Tachyon.Game.Screens.Play
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
             }
+            
+            if (canPause)
+            {
+                Pause();
+                return true;
+            }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
@@ -212,7 +286,10 @@ namespace Tachyon.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            this.Exit();
+            if (canPause)
+                Pause();
+            else
+                this.Exit();
         }
 
         /// <summary>
@@ -221,6 +298,8 @@ namespace Tachyon.Game.Screens.Play
         /// </summary>
         public void Restart()
         {
+            RestartRequested?.Invoke();
+            
             if (this.IsCurrentScreen())
                 performImmediateExit();
             else
@@ -231,8 +310,6 @@ namespace Tachyon.Game.Screens.Play
 
         private void onCompletion()
         {
-            Logger.Log("onCompletion is called");
-            
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
                 return;
@@ -254,8 +331,15 @@ namespace Tachyon.Game.Screens.Play
         }
 
         private void gotoResult()
-        {
-            this.Push(new ResultScreen(createScore()));
+        {    
+            var score = new Score { ScoreInfo = createScore() };
+            
+            scoreManager.Import(score.ScoreInfo)
+                        .ContinueWith(imported => Schedule(() =>
+                        {
+                            if (this.IsCurrentScreen())
+                                this.Push(new ResultScreen(imported.Result));
+                        }));
         }
         
         private ScoreInfo createScore()
@@ -274,8 +358,9 @@ namespace Tachyon.Game.Screens.Play
         {
             switch (e.Key)
             {
+                //TODO: Ganti pake IKeyBindingHandler
                 case Key.Escape:
-                    performImmediateExit();
+                    performUserRequestedExit();
                     return true;
             }
             

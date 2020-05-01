@@ -94,8 +94,14 @@ namespace Tachyon.Game.Screens.Play
         private void prepareNewPlayer()
         {
             player = createPlayer();
+            player.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(player);
+        }
+        
+        private void restartRequested()
+        {
+            ValidForResume = true;
         }
         
         private void pushWhenLoaded()

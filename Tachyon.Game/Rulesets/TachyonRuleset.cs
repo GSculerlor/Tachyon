@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Rulesets.Beatmaps;
@@ -19,8 +18,6 @@ namespace Tachyon.Game.Rulesets
         
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.MouseLeft, TachyonAction.UpperFirst),
-            new KeyBinding(InputKey.MouseRight, TachyonAction.LowerFirst),
             new KeyBinding(InputKey.D, TachyonAction.UpperFirst),
             new KeyBinding(InputKey.F, TachyonAction.UpperSecond),
             new KeyBinding(InputKey.J, TachyonAction.LowerFirst),
