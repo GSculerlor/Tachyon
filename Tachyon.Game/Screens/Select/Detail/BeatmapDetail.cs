@@ -4,11 +4,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
+using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Beatmaps.Drawables;
@@ -19,6 +19,9 @@ namespace Tachyon.Game.Screens.Select.Detail
 {
     public class BeatmapDetail : VisibilityContainer
     {
+        private const float corner_radius = 5;
+        private const float background_alpha = 0.25f;
+        
         protected BeatmapDetailContent DetailContent;
         private BeatmapDetailContent loadingDetailContent;
         
@@ -41,15 +44,16 @@ namespace Tachyon.Game.Screens.Select.Detail
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
+            CornerRadius = corner_radius;
             Masking = true;
             BorderColour = colors.Blue;
             Alpha = 0;
-            EdgeEffect = new EdgeEffectParameters
+            /*EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = colors.BlueLighter,
                 Radius = 10,
-            };
+            };*/
         }
         
         public override bool IsPresent => base.IsPresent || DetailContent == null;
@@ -85,7 +89,6 @@ namespace Tachyon.Game.Screens.Select.Detail
 
             LoadComponentAsync(loadingDetailContent = new BeatmapDetailContent(beatmap)
             {
-                Shear = -Shear,
                 Depth = DetailContent?.Depth + 1 ?? 0
             }, loaded =>
             {
@@ -143,8 +146,7 @@ namespace Tachyon.Game.Screens.Select.Detail
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
-                        Children = new[]
+                        Children = new Drawable[]
                         {
                             new BeatmapBackgroundSprite(beatmap)
                             {
@@ -153,13 +155,47 @@ namespace Tachyon.Game.Screens.Select.Detail
                                 Origin = Anchor.Centre,
                                 FillMode = FillMode.Fill,
                             },
+                            new FillFlowContainer
+                            {
+                                Depth = -1,
+                                RelativeSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Shear = new Vector2(0.8f, 0),
+                                Alpha = 0.5f,
+                                Children = new[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Black,
+                                        Width = 0.4f,
+                                    },
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                        Width = 0.05f,
+                                    },
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                        Width = 0.2f,
+                                    },
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                        Width = 0.05f,
+                                    },
+                                }
+                            },
                         },
                     },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Y = -7,
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Left = 50 },
                         AutoSizeAxes = Axes.Y,

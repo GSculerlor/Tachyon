@@ -281,6 +281,14 @@
                 case Key.Right:
                     SelectNext();
                     return true;
+                
+                case Key.Down:
+                    SelectNext(1, false);
+                    return true;
+
+                case Key.Up:
+                    SelectNext(-1, false);
+                    return true;
             }
 
             return false;
@@ -436,7 +444,6 @@
                             void performMove(float y, float? startY = null)
                             {
                                 if (startY != null) beatmap.MoveTo(new Vector2(0, startY.Value));
-                                beatmap.MoveToX(beatmap.Item.State.Value == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
                                 beatmap.MoveToY(y, 750, Easing.OutExpo);
                             }
 

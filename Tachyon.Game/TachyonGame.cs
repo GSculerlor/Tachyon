@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,12 +13,15 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
+using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
 using Tachyon.Game.Overlays.Music;
+using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
 
@@ -30,10 +34,13 @@ namespace Tachyon.Game
         private DependencyContainer dependencies;
         private Container rightFloatingOverlayContent;
         private MusicController musicController;
+        private ScalingContainer screenContainer;
         
         protected BackButton BackButton;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
         
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -59,7 +66,7 @@ namespace Tachyon.Game
             
             AddRange(new Drawable[]
             {
-                new ScalingContainer
+                screenContainer = new ScalingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -92,7 +99,7 @@ namespace Tachyon.Game
             {
                 Margin = new MarginPadding
                 {
-                    Top = 46,
+                    Top = Toolbar.HEIGHT,
                     Right = 10
                 },
                 Anchor = Anchor.TopRight,
@@ -149,6 +156,28 @@ namespace Tachyon.Game
                     }
                 });
             });
+        }
+        
+        public void CloseAllOverlays()
+        {
+            foreach (var overlay in overlays)
+                overlay.Hide();
+        }
+        
+        private void updateBlockingOverlayFade() =>
+            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? TachyonColor.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+
+        public void AddBlockingOverlay(OverlayContainer overlay)
+        {
+            if (!visibleBlockingOverlays.Contains(overlay))
+                visibleBlockingOverlays.Add(overlay);
+            updateBlockingOverlayFade();
+        }
+
+        public void RemoveBlockingOverlay(OverlayContainer overlay)
+        {
+            visibleBlockingOverlays.Remove(overlay);
+            updateBlockingOverlayFade();
         }
         
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)

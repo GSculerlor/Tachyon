@@ -41,6 +41,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                         RelativeSizeAxes = Axes.X,
                         Height = 24,
                         Masking = true,
+                        CornerRadius = 5,
                         Children = new Drawable[]
                         {
                             new Box

@@ -25,6 +25,10 @@ namespace Tachyon.Game.Input
         {
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+            
+            new KeyBinding(InputKey.Space, GlobalAction.Select),
+            new KeyBinding(InputKey.Enter, GlobalAction.Select),
+            new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -33,6 +37,9 @@ namespace Tachyon.Game.Input
 
     public enum GlobalAction
     {
+        [Description("Select")]
+        Select,
+        
         [Description("Back")]
         Back,
     }

@@ -77,7 +77,7 @@ namespace Tachyon.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(TachyonColor color)
         {
-            background.Colour = color.BackButtonGray.Opacity(180);
+            background.Colour = color.Primary;
         }
         
         public void SetIcon(IconUsage icon)

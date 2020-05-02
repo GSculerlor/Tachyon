@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osuTK;
 using Tachyon.Game.Audio;
@@ -13,44 +14,29 @@ namespace Tachyon.Game.Rulesets.Converters
 {
     public class ConvertHitObjectParser : HitObjectParser
     {
-        /// <summary>
-        /// Handle [HitObject] parsing.
-        /// Hit object syntax: x,y,time,type,hitSound,objectParams,hitSample
-        /// - x (Integer) and y (Integer): Position in osu! pixels of the object.
-        /// - time (Integer): Time when the object is to be hit, in milliseconds from the beginning of the beatmap's audio.
-        /// - type (Integer): Bit flags indicating the type of the object. See the type section.
-        /// - hitSound (Integer): Bit flags indicating the hitsound applied to the object. See the hitsounds section.
-        /// - objectParams (Comma-separated list): Extra parameters specific to the object's type.
-        /// - hitSample (Colon-separated list): Information about which samples are played when the object is hit. It is closely related to hitSound; see the hitsounds section. If it is not written, it defaults to 0:0:0:0:.
-        /// </summary>
-        /// <param name="text">text that will be parsed to hitobject.</param>
-        /// <returns>HitObject result from parsing.</returns>
-        /// <exception cref="FormatException"></exception>
-        /// <exception cref="InvalidDataException"></exception>
+        protected bool FirstObject { get; private set; } = true;
+
+        public ConvertHitObjectParser()
+        {
+        }
+
+        [CanBeNull]
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            
-            // Handle x,y. But not really useful for Tachyon at this point. Will be considered to use for mapping.
+
             Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
 
             //Handle time
             double startTime = Parsing.ParseDouble(split[2]);
 
-            // Handle type that defined in HitObjectType. Not really used at this moment.
             HitObjectType type = (HitObjectType)Parsing.ParseInt(split[3]);
-
-            int comboOffset = (int)(type & HitObjectType.ComboOffset) >> 4;
-            type &= ~HitObjectType.ComboOffset;
-
-            bool combo = type.HasFlag(HitObjectType.NewCombo);
-            type &= ~HitObjectType.NewCombo;
 
             var soundType = (HitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
-            
+
             HitObject result = null;
-            
+
             if (type.HasFlag(HitObjectType.Circle))
             {
                 result = createHit();
@@ -112,25 +98,28 @@ namespace Tachyon.Game.Rulesets.Converters
                 if (repeatCount > 9000)
                     throw new FormatException(@"Repeat count is way too high");
 
+                // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
 
                 if (split.Length > 7)
                 {
                     length = Math.Max(0, Parsing.ParseDouble(split[7], Parsing.MAX_COORDINATE_VALUE));
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (length == 0)
                         length = null;
                 }
-                
+
                 if (split.Length > 10)
                     readCustomSampleBanks(split[10], bankInfo);
 
+                // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
 
+                // Populate node sample bank infos with the default hit object sample bank
                 var nodeBankInfos = new List<SampleBankInfo>();
                 for (int i = 0; i < nodes; i++)
                     nodeBankInfos.Add(bankInfo.Clone());
 
+                // Read any per-node sample banks
                 if (split.Length > 9 && split[9].Length > 0)
                 {
                     string[] sets = split[9].Split('|');
@@ -145,10 +134,12 @@ namespace Tachyon.Game.Rulesets.Converters
                     }
                 }
 
+                // Populate node sound types with the default hit object sound type
                 var nodeSoundTypes = new List<HitSoundType>();
                 for (int i = 0; i < nodes; i++)
                     nodeSoundTypes.Add(soundType);
 
+                // Read any per-node sound types
                 if (split.Length > 8 && split[8].Length > 0)
                 {
                     string[] adds = split[8].Split('|');
@@ -163,14 +154,15 @@ namespace Tachyon.Game.Rulesets.Converters
                     }
                 }
 
+                // Generate the final per-node samples
                 var nodeSamples = new List<IList<HitSampleInfo>>(nodes);
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
                 result = createSlider(convertControlPoints(points, pathType), length, repeatCount);
 
+                // The samples are played when the slider ends, which is the last node
                 result.Samples = nodeSamples[^1];
-
             }
             else if (type.HasFlag(HitObjectType.Spinner))
             {
@@ -181,18 +173,36 @@ namespace Tachyon.Game.Rulesets.Converters
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
             }
+            //TODO: Implement hold
+            /*else if (type.HasFlag(HitObjectType.Hold))
+            {
+                // Note: Hold is generated by BMS converts
+
+                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[2]));
+
+                if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
+                {
+                    string[] ss = split[5].Split(':');
+                    endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
+                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                }
+
+                result = CreateHold(pos, combo, comboOffset, endTime + Offset);
+            }*/
 
             if (result == null)
                 throw new InvalidDataException($"Unknown hit object type: {split[3]}");
 
             result.StartTime = startTime;
-            
+
             if (result.Samples.Count == 0)
                 result.Samples = convertSoundType(soundType, bankInfo);
 
+            FirstObject = false;
+
             return result;
         }
-        
+
         private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
         {
             if (string.IsNullOrEmpty(str))
@@ -221,7 +231,7 @@ namespace Tachyon.Game.Rulesets.Converters
 
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
-        
+
         private PathControlPoint[] convertControlPoints(Vector2[] vertices, PathType type)
         {
             if (type == PathType.PerfectCurve)
@@ -230,6 +240,7 @@ namespace Tachyon.Game.Rulesets.Converters
                     type = PathType.Bezier;
                 else if (isLinear(vertices))
                 {
+                    // osu-stable special-cased colinear perfect curves to a linear path
                     type = PathType.Linear;
                 }
             }
@@ -341,7 +352,7 @@ namespace Tachyon.Game.Rulesets.Converters
 
             return soundTypes;
         }
-        
+
         private class SampleBankInfo
         {
             public string Filename;
@@ -358,6 +369,13 @@ namespace Tachyon.Game.Rulesets.Converters
         private class FileHitSampleInfo : HitSampleInfo
         {
             public string Filename;
+
+            public FileHitSampleInfo()
+            {
+                // Make sure that the BeatmapSkin does not fall back to the user skin.
+                // Note that this does not change the lookup names, as they are overridden locally.
+                CustomSampleBank = 1;
+            }
 
             public override IEnumerable<string> LookupNames => new[]
             {

@@ -17,6 +17,8 @@ namespace Tachyon.Desktop
             
             if (host.Window is DesktopGameWindow desktopWindow)
             {
+                desktopWindow.CursorState |= CursorState.Hidden;
+                
                 //desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 

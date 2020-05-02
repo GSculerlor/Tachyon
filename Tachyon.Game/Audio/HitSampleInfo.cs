@@ -34,10 +34,18 @@ namespace Tachyon.Game.Audio
         /// </summary>
         public int Volume { get; set; }
         
+        private int customSampleBank;
+        
         public int CustomSampleBank
         {
+            get => customSampleBank;
             set
             {
+                customSampleBank = value;
+                
+                if (value >= 2)
+                    Suffix = value.ToString();
+                
                 if (value > 1)
                     Suffix = value.ToString();
             }

@@ -8,7 +8,7 @@ namespace Tachyon.Game.Graphics
 
         public static FontUsage Default => GetFont();
 
-        public static FontUsage Numeric => GetFont(Typeface.Venera);
+        public static FontUsage Numeric => GetFont(Typeface.Digitall);
 
         public static FontUsage GetFont(Typeface typeface = Typeface.Quicksand, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Regular, bool italics = false, bool fixedWidth = false)
             => new FontUsage(GetFamilyString(typeface), size, GetWeightString(weight), italics, fixedWidth);
@@ -22,6 +22,9 @@ namespace Tachyon.Game.Graphics
 
                 case Typeface.Venera:
                     return "Venera";
+                
+                case Typeface.Digitall:
+                    return "Digitall";
             }
 
             return null;
@@ -51,7 +54,8 @@ namespace Tachyon.Game.Graphics
     public enum Typeface
     {
         Venera,
-        Quicksand
+        Quicksand,
+        Digitall
     }
 
     public enum FontWeight

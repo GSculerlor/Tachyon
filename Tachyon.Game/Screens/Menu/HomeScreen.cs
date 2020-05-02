@@ -14,7 +14,7 @@ using Tachyon.Game.Overlays.Toolbar;
 
 namespace Tachyon.Game.Screens.Menu
 {
-    public class HomeScreen : TachyonScreen
+    /*public class HomeScreen : TachyonScreen
     {
         private const int button_height = 80;
 
@@ -255,5 +255,5 @@ namespace Tachyon.Game.Screens.Menu
                 base.OnHoverLost(e);
             }
         }
-    }
+    }*/
 }

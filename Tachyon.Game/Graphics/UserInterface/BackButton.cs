@@ -11,15 +11,15 @@ namespace Tachyon.Game.Graphics.UserInterface
     {
         public Action Action;
 
-        private readonly TwoLayerButton button;
+        private readonly HoverableBackButton button;
 
         public BackButton(Receptor receptor)
         {
             receptor.OnBackPressed = () => button.Click();
 
-            Size = TwoLayerButton.SIZE_EXTENDED;
+            Size = HoverableBackButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton
+            Child = button = new HoverableBackButton
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -31,8 +31,8 @@ namespace Tachyon.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
-            button.BackgroundColour = colors.Pink;
-            button.HoverColour = colors.PinkDark;
+            button.BackgroundColour = colors.Secondary;
+            button.HoverColour = colors.SecondaryDark;
         }
 
         protected override void PopIn()
@@ -43,7 +43,7 @@ namespace Tachyon.Game.Graphics.UserInterface
 
         protected override void PopOut()
         {
-            button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
+            button.MoveToX(-HoverableBackButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
         }
 

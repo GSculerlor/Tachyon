@@ -85,7 +85,7 @@ namespace Tachyon.Game.Screens.Placeholder
             [BackgroundDependencyLoader]
             private void load(TachyonColor color)
             {
-                box.Colour = color.RedSomething.Opacity(0.75f);
+                box.Colour = color.Secondary.Opacity(0.75f);
             }
 
             protected override void LoadComplete()

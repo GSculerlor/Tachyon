@@ -89,14 +89,16 @@ namespace Tachyon.Game.Graphics
         public readonly Color4 Red = FromHex(@"ed1121");
         public readonly Color4 RedDark = FromHex(@"ba0011");
         public readonly Color4 RedDarker = FromHex(@"870000");
-        
-        public readonly Color4 RedSomething = FromHex(@"E9291A");
 
-        public readonly Color4 BackButtonGray = FromHex(@"313131");
+        public readonly Color4 PrimaryDark = FromHex(@"222831");
+        public readonly Color4 Primary = FromHex(@"393e46");
+        public readonly Color4 SecondaryDark = FromHex(@"b53000");
+        public readonly Color4 Secondary = FromHex(@"b55400");
+
+        public readonly Color4 LowerHitObject = FromHex(@"c23434");
+        public readonly Color4 UpperHitObject = FromHex(@"345ac2");
         
-        /// <summary>
-        /// Retrieves the colour for a <see cref="HitResult"/>.
-        /// </summary>
+        
         public Color4 ForHitResult(HitResult judgement)
         {
             switch (judgement)

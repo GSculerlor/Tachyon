@@ -97,11 +97,11 @@ namespace Tachyon.Game.Screens.Menu
                 }
             });            
             
-            //textFlow.AddParagraph("Touch or click anywhere to continue", t => t.Font = TachyonFont.Default.With(size: 30, weight: FontWeight.Regular));
-
             beatmap = Beatmap.BeginLease(false);
             
             BeatmapSetInfo setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/blue_haven.osz"), "blue_haven.osz")).Result;
+            
+            setInfo.Protected = true;
             beatmaps.Update(setInfo);
             
             introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
@@ -168,6 +168,7 @@ namespace Tachyon.Game.Screens.Menu
                 textContainer.FadeOutFromOne(500, Easing.OutQuart);
                 gradientBox.FadeColour(Color4.Black, 500, Easing.OutQuart);
 
+                track.Reset();
                 Scheduler.AddDelayed(loadMenu, 500);
             }, 500);
             

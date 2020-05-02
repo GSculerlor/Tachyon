@@ -23,6 +23,9 @@ namespace Tachyon.Game.Rulesets
         LowerFirst,
         
         [Description("Lower (Second)")]
-        LowerSecond
+        LowerSecond,
+        
+        [Description("Mouse Click")]
+        MouseClick
     }
 }

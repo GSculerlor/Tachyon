@@ -7,15 +7,9 @@ using Tachyon.Game.Rulesets.Objects;
 
 namespace Tachyon.Game.Rulesets.UI.Components
 {
-    /// <summary>
-    /// A component that is displayed at the hit position in the playfield.
-    /// </summary>
     public class HitTarget : Container
     {
-        /// <summary>
-        /// Thickness of all drawn line pieces.
-        /// </summary>
-        private const float border_thickness = 2.5f;
+        private const float border_thickness = 20f;
 
         public HitTarget()
         {
@@ -32,7 +26,6 @@ namespace Tachyon.Game.Rulesets.UI.Components
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
-                    Alpha = 0.5f,
                     Children = new[]
                     {
                         new Box

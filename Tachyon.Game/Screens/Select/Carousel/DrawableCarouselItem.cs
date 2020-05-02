@@ -41,6 +41,7 @@ namespace Tachyon.Game.Screens.Select.Carousel
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
+                CornerRadius = 5,
                 Children = new Drawable[]
                 {
                     nestedContainer = new Container

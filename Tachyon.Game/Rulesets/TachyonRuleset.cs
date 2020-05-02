@@ -22,6 +22,10 @@ namespace Tachyon.Game.Rulesets
             new KeyBinding(InputKey.F, TachyonAction.UpperSecond),
             new KeyBinding(InputKey.J, TachyonAction.LowerFirst),
             new KeyBinding(InputKey.K, TachyonAction.LowerSecond),
+            // This is a hotfix since input is on drawable level via TriggerEvent and it shouldn't be on Row
+            // Due to judgement is handled by DrawableTachyonHitObject, not TachyonPlayfield
+            // https://discordapp.com/channels/188630481301012481/589331078574112768/705526007976689734
+            new KeyBinding(InputKey.MouseLeft, TachyonAction.MouseClick),
         };
 
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap) => new DrawableTachyonRuleset(this, beatmap);

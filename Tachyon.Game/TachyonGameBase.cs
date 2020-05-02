@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -30,6 +31,7 @@ namespace Tachyon.Game
         private TachyonConfigManager LocalConfig;
         
         protected KeyBindingStore KeyBindingStore;
+        protected CursorContainer CursorContainer;
         
         protected FileStore FileStore;
         protected BeatmapManager BeatmapManager;
@@ -40,6 +42,10 @@ namespace Tachyon.Game
         private Storage Storage { get; set; }
         
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        
+        private Container content;
+
+        protected override Container<Drawable> Content => content;
         
         public TachyonGameBase()
         {
@@ -83,6 +89,9 @@ namespace Tachyon.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Medium");
             
+            AddFont(Resources, @"Fonts/Digitall");
+
+            
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
             
             runMigrations();
@@ -121,12 +130,16 @@ namespace Tachyon.Game
             
             FileStore.Cleanup();
             
-            GlobalActionContainer globalBinding = new GlobalActionContainer(this)
+            GlobalActionContainer globalBinding;
+
+            CursorContainer = new CursorContainer { RelativeSizeAxes = Axes.Both };
+            CursorContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = content = new TooltipContainer(CursorContainer) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(CreateScalingContainer().WithChild(globalBinding));
+            base.Content.Add(CreateScalingContainer().WithChild(CursorContainer));
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

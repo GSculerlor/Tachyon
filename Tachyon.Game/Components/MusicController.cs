@@ -4,7 +4,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
-using osu.Framework.Utils;
 using Tachyon.Game.Beatmaps;
 
 namespace Tachyon.Game.Components
@@ -44,7 +43,7 @@ namespace Tachyon.Game.Components
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets());
         }
 
         protected override void LoadComplete()

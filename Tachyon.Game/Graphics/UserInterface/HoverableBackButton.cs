@@ -12,32 +12,24 @@ using Tachyon.Game.Graphics.Sprites;
 
 namespace Tachyon.Game.Graphics.UserInterface
 {
-     public class TwoLayerButton : TachyonClickableContainer
+     public class HoverableBackButton : TachyonClickableContainer
     {
-        public Box IconLayer;
         public Box TextLayer;
 
         private const int transform_time = 600;
-        private const int pulse_length = 250;
 
-        private const float shear_width = 5f;
-
-        private static readonly Vector2 shear = new Vector2(shear_width / 50, 0);
-
-        public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
-        public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
+        public static readonly Vector2 SIZE_EXTENDED = new Vector2(100, 50);
+        public static readonly Vector2 SIZE_RETRACTED = new Vector2(80, 50);
         private readonly SpriteText text;
 
         public Color4 HoverColour;
         private readonly Container c1;
-        private readonly Container c2;
 
         public Color4 BackgroundColour
         {
             set
             {
                 TextLayer.Colour = value;
-                IconLayer.Colour = value;
             }
         }
 
@@ -48,61 +40,28 @@ namespace Tachyon.Game.Graphics.UserInterface
             {
                 base.Origin = value;
                 c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
-                c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * 0.5f : 0;
 
                 Remove(c1);
-                Remove(c2);
                 c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
-                c2.Depth = value.HasFlag(Anchor.x2) ? 1 : 0;
                 Add(c1);
-                Add(c2);
             }
         }
 
-        public TwoLayerButton()
+        public HoverableBackButton()
         {
             Size = SIZE_RETRACTED;
-            Shear = shear;
+            Shear = new Vector2(5f / 50, 0);
 
             Children = new Drawable[]
             {
-                c2 = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.4f,
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Offset = new Vector2(2, 0),
-                                Radius = 2,
-                            },
-                            Children = new[]
-                            {
-                                IconLayer = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    EdgeSmoothness = new Vector2(2, 0),
-                                },
-                            }
-                        }
-                    }
-                },
                 c1 = new Container
                 {
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopLeft,
+                    Anchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.6f,
+                    Width = 1f,
                     Children = new Drawable[]
                     {
                         new Container
@@ -132,7 +91,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Shear = -shear,
+                            Font = TachyonFont.Default.With(weight: FontWeight.SemiBold)
                         }
                     }
                 },
@@ -144,13 +103,11 @@ namespace Tachyon.Game.Graphics.UserInterface
             set => text.Text = value;
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => IconLayer.ReceivePositionalInputAt(screenSpacePos) || TextLayer.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => TextLayer.ReceivePositionalInputAt(screenSpacePos);
 
         protected override bool OnHover(HoverEvent e)
         {
-            this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
-
-            IconLayer.FadeColour(HoverColour, transform_time / 2f, Easing.OutQuint);
+            this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.Out);
 
             return true;
         }
@@ -158,7 +115,6 @@ namespace Tachyon.Game.Graphics.UserInterface
         protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.Out);
-            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.Out);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;

@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +9,6 @@ using osuTK;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
-using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Scoring;
 
 namespace Tachyon.Game.Screens.Result
@@ -20,44 +16,98 @@ namespace Tachyon.Game.Screens.Result
     public class ResultPanel : CompositeDrawable
     {
         private readonly ScoreInfo score;
-        
-        private Container middleLayerContainer;
-        private Drawable middleLayerBackground;
-        private Container middleLayerContentContainer;
-        private Drawable middleLayerContent;
 
         public ResultPanel(ScoreInfo score)
         {
             this.score = score;
-            Size = new Vector2(600, 300);
+            Size = new Vector2(600, 260);
         }
 
         [BackgroundDependencyLoader]
-        private void load(TachyonColor colors)
+        private void load(TachyonColor colors, Bindable<WorkingBeatmap> working)
         {
-            InternalChildren = new Drawable[]
+            var beatmap = working.Value.BeatmapInfo;
+            var metadata = beatmap.Metadata;
+            
+            InternalChild = new FillFlowContainer
             {
-                middleLayerContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, -16),
+                Children = new Drawable[]
                 {
-                    Name = "Middle layer",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        new Container
+                        Name = "Top layer",
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            Masking = true,
-                            Child = middleLayerBackground = new Box {
+                            new Container
+                            {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"))
+                                CornerRadius = 10,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = new Box {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientVertical(colors.Primary, colors.PrimaryDark)
+                                }
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new ResultDetailPanel(score)
                             }
-                        },
-                        middleLayerContentContainer = new Container
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Bottom layer",
+                        RelativeSizeAxes = Axes.X,
+                        Height = 120,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = middleLayerContent = new ResultDetailPanel(score)
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = 10,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colors.PrimaryDark
+                                }
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new FillFlowContainer
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        new TachyonSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                            Font = TachyonFont.Default.With(size: 28, weight: FontWeight.Bold),
+                                        },
+                                        new TachyonSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = $"{new LocalisedString((metadata.ArtistUnicode, metadata.Artist))} - [{beatmap.Version}]",
+                                            Font = TachyonFont.Default.With(size: 24, weight: FontWeight.SemiBold)
+                                        },
+                                    }
+                                }
+                            }
                         }
                     }
                 }

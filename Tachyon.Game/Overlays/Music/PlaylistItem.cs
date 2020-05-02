@@ -35,7 +35,7 @@ namespace Tachyon.Game.Overlays.Music
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors, LocalisationManager localisation)
         {
-            selectedColor = colors.RedSomething;
+            selectedColor = colors.Secondary;
             artistColor = colors.Gray9;
 
             title = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));

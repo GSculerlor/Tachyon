@@ -34,21 +34,21 @@ namespace Tachyon.Game.Screens.Select.Detail
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Y = -7,
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         new TachyonSpriteText
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            Padding = new MarginPadding { Left = 50 },
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Text = @"Highscore".ToUpper(),
-                            Font = TachyonFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Font = TachyonFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         }

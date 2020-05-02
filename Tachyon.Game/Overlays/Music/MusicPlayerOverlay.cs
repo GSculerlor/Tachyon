@@ -16,12 +16,13 @@ using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Graphics.UserInterface;
 
 namespace Tachyon.Game.Overlays.Music
 {
-    public class MusicPlayerOverlay : FocusedOverlayContainer
+    public class MusicPlayerOverlay : TachyonFocusedOverlayContainer
     {
         private const float player_height = 80;
         private const float button_height = 50;

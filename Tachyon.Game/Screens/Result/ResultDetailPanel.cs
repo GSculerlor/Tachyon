@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osuTK;
-using Tachyon.Game.Beatmaps;
-using Tachyon.Game.Graphics;
-using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Scoring;
 
@@ -20,6 +15,7 @@ namespace Tachyon.Game.Screens.Result
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
         
         private RollingCounter<long> scoreCounter;
+        private AccuracyCounter accuracyCounter;
 
         public ResultDetailPanel(ScoreInfo score)
         {
@@ -32,11 +28,8 @@ namespace Tachyon.Game.Screens.Result
         }
 
         [BackgroundDependencyLoader]
-        private void load(Bindable<WorkingBeatmap> working)
+        private void load()
         {
-            var beatmap = working.Value.BeatmapInfo;
-            var metadata = beatmap.Metadata;
-            
             var bottomStatistics = new List<StatisticDisplay>();
             foreach (var stat in score.SortedStatistics)
                 bottomStatistics.Add(new HitResultStatistic(stat.Key, stat.Value));
@@ -56,23 +49,9 @@ namespace Tachyon.Game.Screens.Result
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new TachyonSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
-                                Font = TachyonFont.Default.With(size: 30, weight: FontWeight.SemiBold),
-                            },
-                            new TachyonSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = TachyonFont.Default.With(size: 26, weight: FontWeight.Regular)
-                            },
                             scoreCounter = new ScoreCounter
                             {
                                 Margin = new MarginPadding { Top = 20 },
@@ -81,6 +60,11 @@ namespace Tachyon.Game.Screens.Result
                                 AlwaysPresent = true
                             },
                         }
+                    },
+                    accuracyCounter = new AccuracyCounter(score.Accuracy)
+                    {
+                        Alpha = 0,
+                        AlwaysPresent = true
                     },
                     new FillFlowContainer
                     {
@@ -117,6 +101,9 @@ namespace Tachyon.Game.Screens.Result
                 {
                     scoreCounter.FadeIn();
                     scoreCounter.Current.Value = score.TotalScore;
+                    
+                    accuracyCounter.FadeIn();
+                    accuracyCounter.Appear();
 
                     double delay = 0;
 

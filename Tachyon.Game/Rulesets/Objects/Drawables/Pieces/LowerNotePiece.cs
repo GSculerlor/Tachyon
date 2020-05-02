@@ -16,7 +16,7 @@ namespace Tachyon.Game.Rulesets.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
-            AccentColor = colors.PinkDarker;
+            AccentColor = colors.LowerHitObject;
         }
         
         /// <summary>

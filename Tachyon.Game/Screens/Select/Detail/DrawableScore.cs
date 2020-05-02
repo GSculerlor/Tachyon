@@ -20,7 +20,7 @@ namespace Tachyon.Game.Screens.Select.Detail
         public const float HEIGHT = 80;
 
         private const float corner_radius = 5;
-        private const float background_alpha = 0.25f;
+        private const float background_alpha = 0.5f;
 
         private readonly ScoreInfo score;
 
@@ -68,33 +68,25 @@ namespace Tachyon.Game.Screens.Select.Detail
                         new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = 50 },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 8f),
                             Children = new Drawable[]
                             { 
-                                new FillFlowContainer
+                                scoreLabel = new TachyonSpriteText
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5f, 0f),
-                                    Children = new Drawable[]
-                                    {
-                                        scoreLabel = new TachyonSpriteText
-                                        {
-                                            Colour = Color4.White,
-                                            Text = score.TotalScore.ToString(@"N0"),
-                                            Font = TachyonFont.Numeric.With(size: 23),
-                                        },
-                                    },
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Colour = Color4.White,
+                                    Text = score.TotalScore.ToString(@"N0"),
+                                    Font = TachyonFont.Numeric.With(size: 23),
                                 },
                                 new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
@@ -152,7 +144,7 @@ namespace Tachyon.Game.Screens.Select.Detail
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeTo(0.5f, 300, Easing.OutQuint);
+            background.FadeTo(0.75f, 300, Easing.OutQuint);
             return base.OnHover(e);
         }
 

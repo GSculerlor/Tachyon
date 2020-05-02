@@ -54,7 +54,7 @@ namespace Tachyon.Game.Overlays.Music
                     {
                         new Box
                         {
-                            Colour = colors.Gray3,
+                            Colour = colors.Primary,
                             RelativeSizeAxes = Axes.Both,
                         },
                         beatmapList = new Playlist

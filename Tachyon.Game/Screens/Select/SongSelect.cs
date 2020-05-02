@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Components;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Scoring;
 using Tachyon.Game.Screens.Backgrounds;
 using Tachyon.Game.Screens.Select.Detail;
@@ -27,6 +27,8 @@ namespace Tachyon.Game.Screens.Select
         
         protected BeatmapCarousel Carousel { get; private set; }
 
+        private Toolbar toolbar;
+        
         private BeatmapDetail beatmapDetail;
 
         private HighscoreDetail highscoreDetail;
@@ -45,8 +47,10 @@ namespace Tachyon.Game.Screens.Select
         {
             AddRangeInternal(new Drawable[]
             {
+                toolbar = new Toolbar { State = { Value = Visibility.Visible } },
                 new VerticalMaskingContainer
                 {
+                    Margin = new MarginPadding { Top = Toolbar.HEIGHT * 2 },
                     Children = new Drawable[]
                     {
                         new GridContainer 
@@ -63,24 +67,19 @@ namespace Tachyon.Game.Screens.Select
                                 {
                                     new FillFlowContainer
                                     {
+                                        X = -5,
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         RelativeSizeAxes = Axes.Both,
                                         Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 16),
                                         Children = new Drawable[]
                                         {
                                             beatmapDetail = new BeatmapDetail
                                             {
                                                 Origin = Anchor.Centre,
                                                 Anchor = Anchor.Centre,
-                                                Height = 200,
+                                                Height = 180,
                                                 RelativeSizeAxes = Axes.X,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 20,
-                                                    Right = 40,
-                                                },
                                                 ClickedAction = () => FinaliseSelection()
                                             },
                                             highscoreDetail = new HighscoreDetail
@@ -220,7 +219,7 @@ namespace Tachyon.Game.Screens.Select
 
             Beatmap.Value.Track.Looping = true;
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending && Beatmap.Value.BeatmapSetInfo?.Protected == false)
             {
                 updateComponentFromBeatmap(Beatmap.Value);
 

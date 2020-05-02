@@ -5,7 +5,7 @@ namespace Tachyon.Game.Rulesets.Objects.Drawables
 {
     public class DrawableLowerNote : DrawableNote
     {
-        public override TachyonAction[] HitActions { get; } = { TachyonAction.LowerFirst, TachyonAction.LowerSecond };
+        public override TachyonAction[] HitActions { get; } = { TachyonAction.LowerFirst, TachyonAction.LowerSecond, TachyonAction.MouseClick };
 
         public DrawableLowerNote(Note note)
             : base(note)

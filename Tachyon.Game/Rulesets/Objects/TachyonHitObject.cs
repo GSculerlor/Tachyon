@@ -10,7 +10,7 @@ namespace Tachyon.Game.Rulesets.Objects
         /// <summary>
         /// Default size of a drawable taiko hit object.
         /// </summary>
-        public const float DEFAULT_SIZE = 0.45f;
+        public const float DEFAULT_SIZE = 0.5f;
         
         public readonly Bindable<int> RowBindable = new Bindable<int>();
 

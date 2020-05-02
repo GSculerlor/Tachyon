@@ -12,19 +12,8 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
     [Cached]
     public class Row : ScrollingPlayfield
     {
-        /// <summary>
-        /// Default height of a <see cref="TachyonPlayfield"/> when inside a <see cref="DrawableTachyonRuleset"/>.
-        /// </summary>
-        public const float DEFAULT_HEIGHT = 178;
-
-        /// <summary>
-        /// The offset from left border which the center of the hit target lies at.
-        /// </summary>
+        public const float DEFAULT_HEIGHT = 200;
         public const float HIT_TARGET_OFFSET = 100;
-        
-        /// <summary>
-        /// The index of this column as part of the whole playfield.
-        /// </summary>
         public readonly int Index;
         
         private readonly JudgementContainer<DrawableTachyonJudgement> judgementContainer;

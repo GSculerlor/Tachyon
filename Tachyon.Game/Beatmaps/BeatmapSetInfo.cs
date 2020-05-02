@@ -38,6 +38,8 @@ namespace Tachyon.Game.Beatmaps
         public List<BeatmapSetFileInfo> Files { get; set; }
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
+        
+        public bool Protected { get; set; }
 
         public bool Equals(BeatmapSetInfo other)
         {
