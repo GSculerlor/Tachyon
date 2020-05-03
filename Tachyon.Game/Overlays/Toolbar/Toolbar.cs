@@ -1,4 +1,5 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -6,6 +7,7 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Screens;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace Tachyon.Game.Overlays.Toolbar
@@ -14,6 +16,8 @@ namespace Tachyon.Game.Overlays.Toolbar
     {
         public const float HEIGHT = 50;
         private const double transition_time = 450;
+
+        public Action EditorAction;
         
         public Toolbar()
         {
@@ -51,7 +55,10 @@ namespace Tachyon.Game.Overlays.Toolbar
                             Padding = new MarginPadding { Right = 20 },
                             Children = new Drawable[]
                             {
-                                new ToolbarEditorButton(), 
+                                new ToolbarEditorButton
+                                {
+                                    EditorAction = EditorAction
+                                }, 
                                 new ToolbarMusicButton(),
                                 new ToolbarFullscreenButton(), 
                             }

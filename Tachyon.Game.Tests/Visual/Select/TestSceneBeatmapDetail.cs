@@ -8,7 +8,7 @@ using Tachyon.Game.Rulesets.Converters;
 using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.Screens.Select.Detail;
 
-namespace Tachyon.Game.Tests.Visual.Playground
+namespace Tachyon.Game.Tests.Visual.Select
 {
     public class TestSceneBeatmapDetail : TachyonTestScene
     {

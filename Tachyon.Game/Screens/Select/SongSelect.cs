@@ -17,6 +17,7 @@ using Tachyon.Game.Graphics;
 using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Scoring;
 using Tachyon.Game.Screens.Backgrounds;
+using Tachyon.Game.Screens.Generate;
 using Tachyon.Game.Screens.Select.Detail;
 
 namespace Tachyon.Game.Screens.Select
@@ -47,7 +48,11 @@ namespace Tachyon.Game.Screens.Select
         {
             AddRangeInternal(new Drawable[]
             {
-                toolbar = new Toolbar { State = { Value = Visibility.Visible } },
+                toolbar = new Toolbar
+                {
+                    State = { Value = Visibility.Visible },
+                    EditorAction = gotoEditor
+                },
                 new VerticalMaskingContainer
                 {
                     Margin = new MarginPadding { Top = Toolbar.HEIGHT * 2 },
@@ -112,6 +117,11 @@ namespace Tachyon.Game.Screens.Select
                     }
                 },
             });
+        }
+
+        private void gotoEditor()
+        {
+            this.Push(new Editor());
         }
         
         private DependencyContainer dependencies;

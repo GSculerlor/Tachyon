@@ -11,7 +11,7 @@ using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Screens.Select;
 using Tachyon.Game.Screens.Select.Carousel;
 
-namespace Tachyon.Game.Tests.Visual.Playground
+namespace Tachyon.Game.Tests.Visual.Select
 {
     public class TestSceneBeatmapCarousel : TachyonTestScene
     {
