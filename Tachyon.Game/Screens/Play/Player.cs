@@ -24,6 +24,8 @@ namespace Tachyon.Game.Screens.Play
         
         protected ScoreProcessor ScoreProcessor { get; private set; }
         
+        protected HealthProcessor HealthProcessor { get; private set; }
+        
         private RulesetInfo rulesetInfo;
         private Ruleset ruleset;
         
@@ -37,6 +39,7 @@ namespace Tachyon.Game.Screens.Play
         protected PauseOverlay PauseOverlay { get; private set; }
         
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
+        public bool HasFailed { get; private set; }
 
         private GameplayBeatmap gameplayBeatmap;
         
@@ -62,6 +65,9 @@ namespace Tachyon.Game.Screens.Play
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor.ApplyBeatmap(playableBeatmap);
+            
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
@@ -73,15 +79,18 @@ namespace Tachyon.Game.Screens.Play
             
             DrawableRuleset.OnNewResult += r =>
             {
+                HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
             };
 
             DrawableRuleset.OnRevertResult += r =>
             {
+                HealthProcessor.ApplyResult(r);
                 ScoreProcessor.RevertResult(r);
             };
             
             ScoreProcessor.AllJudged += onCompletion;
+            HealthProcessor.Failed += onFail;
         }
         
         private void addGameplayComponents(Container target)
@@ -95,7 +104,8 @@ namespace Tachyon.Game.Screens.Play
             
             DrawableRuleset.FrameStableComponents.AddRange(new Drawable[]
             {
-                ScoreProcessor
+                ScoreProcessor,
+                HealthProcessor,
             });
         }
 
@@ -103,7 +113,7 @@ namespace Tachyon.Game.Screens.Play
         {
             target.AddRange(new Drawable[]
             {
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset)
                 {
                     Pause =
                     {
@@ -119,6 +129,12 @@ namespace Tachyon.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                 },
+                FailOverlay = new FailOverlay
+                {
+                    OnRetry = Restart,
+                    OnQuit = performUserRequestedExit,
+                },
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
             });
         }
             
@@ -165,7 +181,7 @@ namespace Tachyon.Game.Screens.Play
         private double? lastPauseActionTime;
 
         private bool canPause =>
-            LoadedBeatmapSuccessfully && ValidForResume
+            LoadedBeatmapSuccessfully && ValidForResume && !HasFailed
             // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
             && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
 
@@ -282,6 +298,12 @@ namespace Tachyon.Game.Screens.Play
         private void performUserRequestedExit()
         {
             if (!this.IsCurrentScreen()) return;
+            
+            if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
+            {
+                failAnimation.FinishTransforms(true);
+                return;
+            }
 
             if (canPause)
                 Pause();
@@ -314,11 +336,42 @@ namespace Tachyon.Game.Screens.Play
             // Only show the completion screen if the player hasn't failed
             if (completionProgressDelegate != null)
                 return;
+            
+            // Only show the completion screen if the player hasn't failed
+            if (HealthProcessor.HasFailed)
+                return;
 
             ValidForResume = false;
 
             using (BeginDelayedSequence(1000))
                 scheduleToResult();
+        }
+        
+        protected FailOverlay FailOverlay { get; private set; }
+        
+        private FailAnimation failAnimation;
+
+        private bool onFail()
+        {
+            HasFailed = true;
+
+            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
+            // could process an extra frame after the GameplayClock is stopped.
+            // In such cases we want the fail state to precede a user triggered pause.
+            if (PauseOverlay.State.Value == Visibility.Visible)
+                PauseOverlay.Hide();
+            
+            failAnimation.Start();
+
+            return true;
+        }
+
+        // Called back when the transform finishes
+        private void onFailComplete()
+        {
+            GameplayClockContainer.Stop();
+
+            FailOverlay.Show();
         }
         
         private void scheduleToResult()

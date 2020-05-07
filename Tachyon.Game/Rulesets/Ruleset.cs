@@ -38,14 +38,14 @@ namespace Tachyon.Game.Rulesets
         /// <returns>The score processor.</returns>
         public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
 
-        //TODO: Implement all of this components
-        /*/// <summary>
+        /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The health processor.</returns>
-        public virtual HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime);
+        public HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime);
         
-        public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
+        //TODO: Implement all of this components
+        /* public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
         */

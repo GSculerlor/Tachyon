@@ -16,16 +16,19 @@ namespace Tachyon.Game.Screens.Play
         public readonly BeatmapProgress Progress;
         public readonly RollingCounter<int> ComboCounter;
         public readonly RollingCounter<double> ScoreCounter;
+        public readonly HealthBar HealthBar;
         public readonly PauseButton Pause;
         public readonly BeatmapTitle Title;
         
         private readonly DrawableRuleset drawableRuleset;
         private readonly ScoreProcessor scoreProcessor;
+        private readonly HealthProcessor healthProcessor;
 
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset)
+        public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset)
         {
             this.scoreProcessor = scoreProcessor;
+            this.healthProcessor = healthProcessor;
             this.drawableRuleset = drawableRuleset;
             
             RelativeSizeAxes = Axes.Both;
@@ -95,7 +98,14 @@ namespace Tachyon.Game.Screens.Play
                         },
                         Title = new BeatmapTitle
                         {
-                            Margin = new MarginPadding { Left = 20, Bottom = 8},
+                            Margin = new MarginPadding { Left = 20, Bottom = 15 },
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                        },
+                        HealthBar = new HealthBar
+                        {
+                            Size = new Vector2(1, 5),
+                            RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                         }
@@ -110,6 +120,9 @@ namespace Tachyon.Game.Screens.Play
             if (scoreProcessor != null)
                 BindScoreProcessor(scoreProcessor);
             
+            if (healthProcessor != null)
+                BindHealthProcessor(healthProcessor);
+            
             if (drawableRuleset != null)
             {
                 Progress.Objects = drawableRuleset.Objects;
@@ -121,6 +134,11 @@ namespace Tachyon.Game.Screens.Play
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             ComboCounter?.Current.BindTo(processor.Combo);
+        }
+        
+        protected virtual void BindHealthProcessor(HealthProcessor processor)
+        {
+            HealthBar?.BindHealthProcessor(processor);
         }
     }
 }
