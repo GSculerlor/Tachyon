@@ -18,16 +18,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tachyon.Resources", "Tachyo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tachyon.Android", "Tachyon.Android\Tachyon.Android.csproj", "{A66E5EBD-4B71-4312-A9EA-9C02840B3A65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tachyon.iOS", "Tachyon.iOS\Tachyon.iOS.csproj", "{E752576E-1103-4AF8-9EC2-EB29CBE0B8D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AEB3FC89-DC3E-4BC9-9EC7-03B72FC5D849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AEB3FC89-DC3E-4BC9-9EC7-03B72FC5D849}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AEB3FC89-DC3E-4BC9-9EC7-03B72FC5D849}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AEB3FC89-DC3E-4BC9-9EC7-03B72FC5D849}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F02A411C-F069-433F-8910-7511A0DE34F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F02A411C-F069-433F-8910-7511A0DE34F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F02A411C-F069-433F-8910-7511A0DE34F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,10 +38,10 @@ Global
 		{811374A7-A59C-44F3-B223-372E5E27FDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{811374A7-A59C-44F3-B223-372E5E27FDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{811374A7-A59C-44F3-B223-372E5E27FDFF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A66E5EBD-4B71-4312-A9EA-9C02840B3A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A66E5EBD-4B71-4312-A9EA-9C02840B3A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A66E5EBD-4B71-4312-A9EA-9C02840B3A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A66E5EBD-4B71-4312-A9EA-9C02840B3A65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E752576E-1103-4AF8-9EC2-EB29CBE0B8D1}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{E752576E-1103-4AF8-9EC2-EB29CBE0B8D1}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
+		{E752576E-1103-4AF8-9EC2-EB29CBE0B8D1}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
+		{E752576E-1103-4AF8-9EC2-EB29CBE0B8D1}.Release|Any CPU.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
