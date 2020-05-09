@@ -44,7 +44,20 @@ using Tachyon.Game.Rulesets.Scoring;
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
         /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        protected virtual int NumericResultFor(HitResult result) => result > HitResult.Miss ? 1 : 0;
+        protected virtual int NumericResultFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Good:
+                    return 100;
+
+                case HitResult.Perfect:
+                    return 300;
+
+                default:
+                    return 0;
+            }
+        }
 
         /// <summary>
         /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
@@ -66,7 +79,7 @@ using Tachyon.Game.Rulesets.Scoring;
                     return -DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.Good:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.Perfect:
                     return DEFAULT_MAX_HEALTH_INCREASE * 1;

@@ -83,12 +83,6 @@ namespace Tachyon.Game.Graphics.UserInterface
                             Width = idle_width,
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 5,
-                            },
                             Colour = Color4.Transparent,
                             Children = new Drawable[]
                             {
@@ -210,14 +204,12 @@ namespace Tachyon.Game.Graphics.UserInterface
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutQuint);
                 colorContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutQuint);
-                colorContainer.Shear = new Vector2(0.2f, 0);
                 colorContainer.Colour = buttonColor;
                 glowContainer.FadeIn(hover_duration, Easing.OutQuint);
             }
             else
             {
                 colorContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutQuint);
-                colorContainer.Shear = new Vector2(0);
                 colorContainer.Colour = Color4.Transparent;
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutQuint);
                 glowContainer.FadeOut(hover_duration, Easing.OutQuint);

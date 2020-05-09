@@ -10,9 +10,6 @@ namespace Tachyon.Game.Rulesets.Judgements
         {
             switch (result)
             {
-                case HitResult.Perfect:
-                    return 200;
-
                 default:
                     return 0;
             }
