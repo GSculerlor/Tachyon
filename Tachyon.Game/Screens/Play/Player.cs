@@ -4,9 +4,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osuTK.Input;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Rulesets;
@@ -405,6 +407,18 @@ namespace Tachyon.Game.Screens.Play
             ScoreProcessor.PopulateScore(score);
 
             return score;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    Pause();
+                    return true;
+            }
+            
+            return base.OnKeyDown(e);
         }
     }
 }
