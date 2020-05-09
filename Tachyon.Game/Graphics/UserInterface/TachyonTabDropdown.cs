@@ -36,7 +36,7 @@ namespace Tachyon.Game.Graphics.UserInterface
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableTachyonTabDropdownMenuItem(item);
 
-            private class DrawableTachyonTabDropdownMenuItem : TachyonDrawableDropdownMenuItem
+            private class DrawableTachyonTabDropdownMenuItem : DrawableTachyonDropdownMenuItem
             {
                 public DrawableTachyonTabDropdownMenuItem(MenuItem item)
                     : base(item)

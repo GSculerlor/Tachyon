@@ -32,6 +32,9 @@ namespace Tachyon.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
         
+        [Resolved]
+        private TachyonRuleset tachyonRuleset { get; set; }
+        
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
         
         protected HUDOverlay HUDOverlay { get; private set; }
@@ -147,7 +150,7 @@ namespace Tachyon.Game.Screens.Play
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                rulesetInfo = new TachyonRuleset().RulesetInfo;
+                rulesetInfo = tachyonRuleset.RulesetInfo;
                 ruleset = rulesetInfo.CreateInstance();
 
                 try

@@ -49,7 +49,7 @@ namespace Tachyon.Game.Screens.Generate
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TachyonColor colors, GameHost host)
+        private void load(TachyonColor colors, GameHost host, TachyonRuleset ruleset)
         {
             beatDivisor.Value = 4;
 
@@ -64,7 +64,7 @@ namespace Tachyon.Game.Screens.Generate
             
             try
             {
-                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(new TachyonRuleset().RulesetInfo);
+                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo);
             }
             catch (Exception e)
             {

@@ -9,34 +9,43 @@ namespace Tachyon.Game.Screens.Backgrounds
 {
     public class DefaultBackgroundScreen : BackgroundScreen
     {
-        private ScheduledDelegate nextTask;
         private Background background;
-        
+
+        private int currentDisplay;
+
+        private string backgroundName => @"Backgrounds/background_gatau_cantik";
+
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
-        
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmap.ValueChanged += _ => Next();
-
             display(createBackground());
         }
-        
-        public void Next()
-        {
-            nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
-        }
-        
+
         private void display(Background newBackground)
         {
             background?.FadeOut(800, Easing.InOutSine);
             background?.Expire();
 
             AddInternal(background = newBackground);
+            currentDisplay++;
         }
-        
-        private Background createBackground() => new BeatmapBackground(beatmap.Value);
+
+        private ScheduledDelegate nextTask;
+
+        public void Next()
+        {
+            nextTask?.Cancel();
+            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+        }
+
+        private Background createBackground()
+        {
+            var newBackground = new Background(backgroundName) { Depth = currentDisplay };
+
+            return newBackground;
+        }
     }
 }

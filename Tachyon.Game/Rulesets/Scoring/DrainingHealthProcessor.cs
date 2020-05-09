@@ -42,7 +42,7 @@ namespace Tachyon.Game.Rulesets.Scoring
 
         private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
         private double targetMinimumHealth;
-        private double drainRate = 1;
+        private double drainRate = 0.25;
 
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
@@ -89,7 +89,7 @@ namespace Tachyon.Game.Rulesets.Scoring
         {
             base.Reset(storeResults);
 
-            drainRate = 1;
+            drainRate = 0.25;
 
             if (storeResults)
                 drainRate = computeDrainRate();
@@ -111,7 +111,6 @@ namespace Tachyon.Game.Rulesets.Scoring
             {
                 double currentHealth = 1;
                 double lowestHealth = 1;
-                int currentBreak = -1;
 
                 for (int i = 0; i < healthIncreases.Count; i++)
                 {

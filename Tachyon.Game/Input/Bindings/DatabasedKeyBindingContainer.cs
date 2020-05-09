@@ -56,6 +56,12 @@ namespace Tachyon.Game.Input.Bindings
                 store.KeyBindingChanged -= ReloadMappings;
         }
 
-        protected override void ReloadMappings() => KeyBindings = store.Query(ruleset?.ID).ToList();
+        protected override void ReloadMappings()
+        {
+            if (ruleset != null && !ruleset.ID.HasValue)
+                KeyBindings = DefaultKeyBindings;
+            else
+                KeyBindings = store.Query(ruleset?.ID, 0).ToList();
+        }
     }
 }

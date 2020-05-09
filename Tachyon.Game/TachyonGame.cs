@@ -21,6 +21,7 @@ using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
 using Tachyon.Game.Overlays.Music;
+using Tachyon.Game.Overlays.Settings;
 using Tachyon.Game.Overlays.Toolbar;
 using Tachyon.Game.Screens;
 using Tachyon.Game.Screens.Menu;
@@ -33,10 +34,12 @@ namespace Tachyon.Game
         private IntroScreen introScreen;
         private DependencyContainer dependencies;
         private Container rightFloatingOverlayContent;
+        private Container topMostOverlayContent;
         private MusicController musicController;
         private ScalingContainer screenContainer;
         
         protected BackButton BackButton;
+        protected SettingsPanel Settings;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -86,6 +89,7 @@ namespace Tachyon.Game
                     }
                 },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
             });
 
             screenStack.ScreenPushed += screenPushed;
@@ -105,6 +109,9 @@ namespace Tachyon.Game
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
+            
+            loadComponentSingleFile(Settings = new SettingsOverlay(), topMostOverlayContent.Add, true);
+
         }
 
         protected override Container CreateScalingContainer() => new ScalingContainer();

@@ -11,10 +11,12 @@ namespace Tachyon.Game.Scoring
         private IBeatmap currentBeatmap;
         
         private readonly BeatmapManager beatmaps;
+        private readonly TachyonRuleset ruleset;
 
-        public ScoreDecoder(BeatmapManager beatmaps)
+        public ScoreDecoder(BeatmapManager beatmaps, TachyonRuleset ruleset)
         {
             this.beatmaps = beatmaps;
+            this.ruleset = ruleset;
         }
 
         public Score Parse(Stream stream)
@@ -46,7 +48,7 @@ namespace Tachyon.Game.Scoring
                 /* score.Perfect = */
                 sr.ReadBoolean();
                 
-                currentBeatmap = workingBeatmap.GetPlayableBeatmap(new TachyonRuleset().RulesetInfo);
+                currentBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
                 scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 /* score.HpGraphString = */

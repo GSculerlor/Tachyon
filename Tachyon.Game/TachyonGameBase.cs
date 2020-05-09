@@ -19,6 +19,7 @@ using Tachyon.Game.Database;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Input;
 using Tachyon.Game.IO;
+using Tachyon.Game.Rulesets;
 using Tachyon.Game.Scoring;
 
 namespace Tachyon.Game
@@ -32,7 +33,8 @@ namespace Tachyon.Game
         
         protected KeyBindingStore KeyBindingStore;
         protected CursorContainer CursorContainer;
-        
+
+        protected TachyonRuleset Ruleset;
         protected FileStore FileStore;
         protected BeatmapManager BeatmapManager;
         protected ScoreManager ScoreManager;
@@ -96,13 +98,14 @@ namespace Tachyon.Game
             
             runMigrations();
             
+            dependencies.Cache(Ruleset = new TachyonRuleset());
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
             
             var defaultBeatmap = new PlaceholderWorkingBeatmap(Audio, Textures);
             
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(Ruleset, contextFactory));
             
-            dependencies.Cache(ScoreManager = new ScoreManager(() => BeatmapManager, Storage, contextFactory, Host));
+            dependencies.Cache(ScoreManager = new ScoreManager(Ruleset, () => BeatmapManager, Storage, contextFactory, Host));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, Audio, Host, defaultBeatmap));
             dependencies.Cache(new TachyonColor());
             
@@ -151,8 +154,7 @@ namespace Tachyon.Game
         {
             base.LoadComplete();
             
-            //TODO: Change this hardcoded config when setting is implemented
-            fpsDisplayVisible = new Bindable<bool>();
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(TachyonSetting.ShowFpsDisplay);
             fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
 

@@ -14,6 +14,12 @@ namespace Tachyon.Game.Tests
         {
             base.LoadComplete();
             
+            LoadComponentAsync(new ScreenStack(new DefaultBackgroundScreen { Colour = TachyonColor.Gray(0.2f) })
+            {
+                Depth = 10,
+                RelativeSizeAxes = Axes.Both,
+            }, AddInternal);
+            
             AddRange(new Drawable[]
             {
                 new TestBrowser("Tachyon"),

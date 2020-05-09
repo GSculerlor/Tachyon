@@ -13,15 +13,15 @@ namespace Tachyon.Game.Input
     {
         public event Action KeyBindingChanged;
 
-        public KeyBindingStore(DatabaseContextFactory contextFactory, Storage storage = null)
+        public KeyBindingStore(TachyonRuleset tachyonRuleset, DatabaseContextFactory contextFactory, Storage storage = null)
             : base(contextFactory, storage)
         {
             using (ContextFactory.GetForWrite())
             {
-                var rulesetInfo = new TachyonRuleset().RulesetInfo;
+                var rulesetInfo = tachyonRuleset.RulesetInfo;
                 var ruleset = rulesetInfo.CreateInstance();
                 
-                insertDefaults(ruleset.GetDefaultKeyBindings(), rulesetInfo.ID);
+                insertDefaults(ruleset.GetDefaultKeyBindings(0), rulesetInfo.ID, 0);
             }
         }
 

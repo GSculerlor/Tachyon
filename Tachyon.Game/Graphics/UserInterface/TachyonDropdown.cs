@@ -14,11 +14,40 @@ namespace Tachyon.Game.Graphics.UserInterface
 {
     public class TachyonDropdown<T> : Dropdown<T>
     {
+        private Color4 accentColour;
+
+        public Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+                updateAccentColour();
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TachyonColor colors)
+        {
+            if (accentColour == default)
+                accentColour = colors.PinkDarker;
+            updateAccentColour();
+        }
+
+        private void updateAccentColour()
+        {
+            /*if (Header is IHasAccentColour header) header.AccentColour = accentColour;
+
+            if (Menu is IHasAccentColour menu) menu.AccentColour = accentColour;*/
+        }
+
         protected override DropdownHeader CreateHeader() => new TachyonDropdownHeader();
 
         protected override DropdownMenu CreateMenu() => new TachyonDropdownMenu();
 
-        public class TachyonDropdownMenu : DropdownMenu
+        #region TachyonDropdownMenu
+
+        protected class TachyonDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
             
@@ -45,21 +74,57 @@ namespace Tachyon.Game.Graphics.UserInterface
                     this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
                 }
             }
-            
+
+            private Color4 accentColour;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    accentColour = value;
+                    /*foreach (var c in Children.OfType<IHasAccentColour>())
+                        c.AccentColour = value;*/
+                }
+            }
+
             protected override Menu CreateSubMenu() => new TachyonMenu(Direction.Vertical);
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new TachyonDrawableDropdownMenuItem(item);
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableTachyonDropdownMenuItem(item);
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new TachyonScrollContainer(direction);
 
-            public class TachyonDrawableDropdownMenuItem : DrawableDropdownMenuItem
+            #region DrawableOsuDropdownMenuItem
+
+            public class DrawableTachyonDropdownMenuItem : DrawableDropdownMenuItem
             {
+                // IsHovered is used
                 public override bool HandlePositionalInput => true;
-                
+
+                private Color4? accentColour;
+
+                public Color4 AccentColour
+                {
+                    get => accentColour ?? nonAccentSelectedColour;
+                    set
+                    {
+                        accentColour = value;
+                        updateColours();
+                    }
+                }
+
+                private void updateColours()
+                {
+                    BackgroundColourHover = accentColour ?? nonAccentHoverColour;
+                    BackgroundColourSelected = accentColour ?? nonAccentSelectedColour;
+                    UpdateBackgroundColour();
+                    UpdateForegroundColour();
+                }
+
                 private Color4 nonAccentHoverColour;
                 private Color4 nonAccentSelectedColour;
 
-                public TachyonDrawableDropdownMenuItem(MenuItem item)
+                public DrawableTachyonDropdownMenuItem(MenuItem item)
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
@@ -67,7 +132,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                     Masking = true;
                     CornerRadius = 6;
                 }
-                
+
                 [BackgroundDependencyLoader]
                 private void load(TachyonColor colors)
                 {
@@ -77,23 +142,8 @@ namespace Tachyon.Game.Graphics.UserInterface
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
                 }
-                
-                protected override void UpdateForegroundColour()
-                {
-                    base.UpdateForegroundColour();
-
-                    if (Foreground.Children.FirstOrDefault() is Content content) content.Chevron.Alpha = IsHovered ? 1 : 0;
-                }
 
                 protected override Drawable CreateContent() => new Content();
-                
-                private void updateColours()
-                {
-                    BackgroundColourHover = nonAccentHoverColour;
-                    BackgroundColourSelected = nonAccentSelectedColour;
-                    UpdateBackgroundColour();
-                    UpdateForegroundColour();
-                }
 
                 protected new class Content : FillFlowContainer, IHasText
                 {
@@ -104,7 +154,6 @@ namespace Tachyon.Game.Graphics.UserInterface
                     }
 
                     public readonly TachyonSpriteText Label;
-                    public readonly SpriteIcon Chevron;
 
                     public Content()
                     {
@@ -114,19 +163,9 @@ namespace Tachyon.Game.Graphics.UserInterface
 
                         Children = new Drawable[]
                         {
-                            Chevron = new SpriteIcon
-                            {
-                                AlwaysPresent = true,
-                                Icon = FontAwesome.Solid.ChevronRight,
-                                Colour = Color4.Black,
-                                Alpha = 0.5f,
-                                Size = new Vector2(8),
-                                Margin = new MarginPadding { Left = 3, Right = 3 },
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                            },
                             Label = new TachyonSpriteText
                             {
+                                Font = TachyonFont.Default.With(size: 18, weight: FontWeight.SemiBold),
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
@@ -134,7 +173,11 @@ namespace Tachyon.Game.Graphics.UserInterface
                     }
                 }
             }
+
+            #endregion
         }
+
+        #endregion
 
         public class TachyonDropdownHeader : DropdownHeader
         {
@@ -147,6 +190,18 @@ namespace Tachyon.Game.Graphics.UserInterface
             }
 
             protected readonly SpriteIcon Icon;
+
+            private Color4 accentColour;
+
+            public virtual Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    accentColour = value;
+                    BackgroundColourHover = accentColour;
+                }
+            }
 
             public TachyonDropdownHeader()
             {
@@ -161,6 +216,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                 {
                     Text = new TachyonSpriteText
                     {
+                        Font = TachyonFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },

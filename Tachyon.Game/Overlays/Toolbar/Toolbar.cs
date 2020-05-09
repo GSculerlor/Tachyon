@@ -59,6 +59,7 @@ namespace Tachyon.Game.Overlays.Toolbar
                                 {
                                     EditorAction = EditorAction
                                 }, 
+                                new ToolbarSettingsButton(),
                                 new ToolbarMusicButton(),
                                 new ToolbarFullscreenButton(), 
                             }

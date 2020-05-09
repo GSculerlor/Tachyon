@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Database;
 using Tachyon.Game.IO.Archives;
+using Tachyon.Game.Rulesets;
 
 namespace Tachyon.Game.Scoring
 {
@@ -17,11 +18,13 @@ namespace Tachyon.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
         
+        private readonly TachyonRuleset ruleset;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreManager(Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
+        public ScoreManager(TachyonRuleset ruleset, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
             : base(storage, contextFactory, new ScoreStore(contextFactory, storage), importHost)
         {
+            this.ruleset = ruleset;
             this.beatmaps = beatmaps;
         }
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -33,7 +36,7 @@ namespace Tachyon.Game.Scoring
             {
                 try
                 {
-                    return new ScoreDecoder(beatmaps()).Parse(stream).ScoreInfo;
+                    return new ScoreDecoder(beatmaps(), ruleset).Parse(stream).ScoreInfo;
                 }
                 catch (ScoreDecoder.BeatmapNotFoundException e)
                 {
