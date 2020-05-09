@@ -1,22 +1,28 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
  using osu.Framework.Allocation;
  using osu.Framework.Graphics;
  using osu.Framework.Graphics.Colour;
  using osu.Framework.Graphics.Containers;
- using osu.Framework.Graphics.Shapes;
- using osu.Framework.Localisation;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
  using osuTK;
  using osuTK.Graphics;
  using Tachyon.Game.Beatmaps;
  using Tachyon.Game.Beatmaps.Drawables;
  using Tachyon.Game.Graphics;
  using Tachyon.Game.Graphics.Sprites;
+using Tachyon.Game.Graphics.UserInterface;
 
- namespace Tachyon.Game.Screens.Select.Carousel
+namespace Tachyon.Game.Screens.Select.Carousel
 {
-    public class DrawableCarouselBeatmapSet : DrawableCarouselItem
+    public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         private readonly BeatmapSetInfo beatmapSet;
+
+        private BeatmapManager manager;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
@@ -27,6 +33,8 @@
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager)
         {
+            this.manager = manager;
+            
             Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
@@ -117,6 +125,21 @@
                         }
                     },
                 };
+            }
+        }
+        
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Item.State.Value == CarouselItemState.NotSelected)
+                    items.Add(new TachyonMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+                
+                items.Add(new TachyonMenuItem("Delete", MenuItemType.Destructive, () => manager.Delete(beatmapSet)));
+                
+                return items.ToArray();
             }
         }
     }

@@ -7,6 +7,7 @@
  using osu.Framework.Extensions.IEnumerableExtensions;
  using osu.Framework.Graphics;
  using osu.Framework.Graphics.Containers;
+ using osu.Framework.Graphics.Cursor;
  using osu.Framework.Input.Events;
  using osu.Framework.Threading;
  using osuTK;
@@ -88,7 +89,7 @@
         public BeatmapCarousel()
         {
             root = new CarouselRoot();
-            InternalChild = new Container
+            InternalChild = new BasicContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = scroll = new CarouselScrollContainer

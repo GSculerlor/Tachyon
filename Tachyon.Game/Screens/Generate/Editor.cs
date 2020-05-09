@@ -15,6 +15,7 @@ using osuTK.Graphics;
 using osuTK.Input;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
 using Tachyon.Game.Rulesets;
 using Tachyon.Game.Screens.Generate.Components;
@@ -117,6 +118,32 @@ namespace Tachyon.Game.Screens.Generate
                                         new Dimension(),
                                         new Dimension(GridSizeMode.Absolute, 90),
                                     }
+                                },
+                            }
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Bottom bar",
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 60,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colors.Gray3
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                                Child = new SummaryTimeline
+                                {
+                                    Padding = new MarginPadding { Left = HoverableBackButton.SIZE_RETRACTED.X },
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                             }
                         }
