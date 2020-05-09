@@ -13,15 +13,16 @@ using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Graphics.Sprites;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
 
 namespace Tachyon.Game.Screens.Play
 {
-    public class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private const int transition_duration = 200;
-        private const int button_height = 90;
+        private const int button_height = 70;
         private const float background_alpha = 0.75f;
         
         protected override bool BlockNonPositionalInput => true;
@@ -37,6 +38,8 @@ namespace Tachyon.Game.Screens.Play
 
         protected internal FillFlowContainer<OverlayButton> InternalButtons;
         public IReadOnlyList<OverlayButton> Buttons => InternalButtons;
+        
+        public abstract string Header { get; }
         
         protected GameplayMenuOverlay()
         {
@@ -67,6 +70,29 @@ namespace Tachyon.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
+                        new FillFlowContainer
+                        {
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 20),
+                            Children = new Drawable[]
+                            {
+                                new TachyonSpriteText
+                                {
+                                    Text = Header,
+                                    Font = TachyonFont.GetFont(size: 30, weight: FontWeight.Bold),
+                                    Spacing = new Vector2(3, 0),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Colour = colors.YellowDark,
+                                    Shadow = true,
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                }
+                            }
+                        },
                         InternalButtons = new FillFlowContainer<OverlayButton>
                         {
                             Origin = Anchor.TopCentre,
@@ -97,13 +123,12 @@ namespace Tachyon.Game.Screens.Play
         
         private int selectionIndex = -1;
         
-        protected void AddButton(string text, IconUsage icon, Action action, bool isDestructive = false)
+        protected void AddButton(Color4 color, string text, Action action)
         {
             var button = new OverlayButton
             {
                 Text = text,
-                Icon = icon,
-                IsDestructive = isDestructive,
+                ButtonColor = color,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
                 Height = button_height,

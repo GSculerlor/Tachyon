@@ -7,11 +7,13 @@ namespace Tachyon.Game.Screens.Play
 {
     public class FailOverlay : GameplayMenuOverlay
     {
+        public override string Header => "FAILED";
+
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
-            AddButton("Retry", FontAwesome.Solid.UndoAlt, () => OnRetry?.Invoke());
-            AddButton("Leave", FontAwesome.Solid.Running, () => OnQuit?.Invoke());
+            AddButton(colors.SecondaryDark, "Retry",  () => OnRetry?.Invoke());
+            AddButton(colors.SecondaryDark, "Leave",  () => OnQuit?.Invoke());
         }
     }
 }

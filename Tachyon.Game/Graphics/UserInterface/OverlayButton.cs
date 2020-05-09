@@ -1,8 +1,10 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
@@ -13,27 +15,57 @@ namespace Tachyon.Game.Graphics.UserInterface
 {
     public class OverlayButton : ClickableContainer
     {
-        private const float idle_width = 0.8f;
+        private const float idle_width = 0.5f;
+        private const float hover_width = 0.7f;
 
         private const float hover_duration = 500;
+        private const float click_duration = 200;
 
         public readonly BindableBool Selected = new BindableBool();
 
-        private readonly Container backgroundContainer;
+        private readonly Container colorContainer;
+        private readonly Container glowContainer;
+        private readonly Box leftGlow;
+        private readonly Box centerGlow;
+        private readonly Box rightGlow;
         private readonly SpriteText spriteText;
-        private readonly SpriteIcon spriteIcon;
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
-        
+
         public OverlayButton()
         {
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
             {
-                backgroundContainer = new Container
+                glowContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 1f
+                    Width = 1f,
+                    Alpha = 0f,
+                    Children = new Drawable[]
+                    {
+                        leftGlow = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.TopLeft,
+                            Anchor = Anchor.TopLeft,
+                            Width = 0.125f,
+                        },
+                        centerGlow = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Width = 0.75f,
+                        },
+                        rightGlow = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Width = 0.125f,
+                        },
+                    },
                 },
                 new Container
                 {
@@ -43,7 +75,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Container
+                        colorContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -57,53 +89,46 @@ namespace Tachyon.Game.Graphics.UserInterface
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Radius = 5,
                             },
+                            Colour = Color4.Transparent,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    EdgeSmoothness = new Vector2(2, 0),
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            },
                         },
                     },
                 },
-                new GridContainer
+                spriteText = new TachyonSpriteText
                 {
+                    Text = Text,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new []
-                    {
-                        new Dimension(GridSizeMode.Relative, 0.1f, maxSize: 200),
-                        new Dimension(GridSizeMode.Relative, 0.3f, maxSize: 850),
-                        new Dimension()
-                    },
-                    Content = new []
-                    {
-                        new Drawable[]
-                        {
-                            new Container { RelativeSizeAxes = Axes.Both }, 
-                            spriteIcon = new SpriteIcon
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(26),
-                                Colour = IsDestructive ? Color4.Red : Color4.White,
-                                Alpha = 0.8f,
-                            },
-                            spriteText = new TachyonSpriteText
-                            {
-                                Padding = new MarginPadding { Horizontal = 26 },
-                                Text = Text,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Font = TachyonFont.GetFont(size: 32, weight: FontWeight.Bold),
-                                Shadow = true,
-                                ShadowColour = new Color4(0, 0, 0, 0.1f),
-                                Colour = IsDestructive ? Color4.Red : Color4.White,
-                            },
-                        }
-                    }
+                    Font = TachyonFont.GetFont(size: 28, weight: FontWeight.Bold),
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.1f),
+                    Colour = Color4.White,
                 },
             };
+
+            updateGlow();
 
             Selected.ValueChanged += selectionChanged;
         }
 
-        public bool IsDestructive { get; set; }
+        private Color4 buttonColor;
+
+        public Color4 ButtonColor
+        {
+            get => buttonColor;
+            set
+            {
+                buttonColor = value;
+                updateGlow();
+            }
+        }
 
         private string text;
 
@@ -116,38 +141,50 @@ namespace Tachyon.Game.Graphics.UserInterface
                 spriteText.Text = Text;
             }
         }
-        
-        private IconUsage icon;
 
-        public IconUsage Icon
+        public float TextSize
         {
-            get => icon;
-            set
-            {
-                icon = value;
-                spriteIcon.Icon = Icon;
-            }
+            get => spriteText.Font.Size;
+            set => spriteText.Font = spriteText.Font.With(size: value);
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
+        private bool clickAnimating;
 
         protected override bool OnClick(ClickEvent e)
         {
-            Selected.TriggerChange();
+            var flash = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = ButtonColor,
+                Blending = BlendingParameters.Additive,
+                Alpha = 0.05f
+            };
+
+            colorContainer.Add(flash);
+            flash.FadeOutFromOne(100).Expire();
+
+            clickAnimating = true;
+            colorContainer.ResizeWidthTo(colorContainer.Width * 1.05f, 100, Easing.OutQuint)
+                           .OnComplete(_ =>
+                           {
+                               clickAnimating = false;
+                               Selected.TriggerChange();
+                           });
 
             return base.OnClick(e);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            Selected.Value = true;
+            colorContainer.ResizeWidthTo(hover_width * 0.98f, click_duration * 4, Easing.OutQuad);
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            Selected.Value = true;
-            return base.OnMouseMove(e);
+            if (Selected.Value)
+                colorContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -166,8 +203,32 @@ namespace Tachyon.Game.Graphics.UserInterface
 
         private void selectionChanged(ValueChangedEvent<bool> args)
         {
-            spriteText.TransformSpacingTo(args.NewValue ? hoverSpacing : Vector2.Zero, hover_duration, Easing.OutElastic);
-            spriteIcon.ResizeTo(args.NewValue ? new Vector2(32) : new Vector2(26), hover_duration, Easing.OutElastic);
+            if (clickAnimating)
+                return;
+
+            if (args.NewValue)
+            {
+                spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutQuint);
+                colorContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutQuint);
+                colorContainer.Shear = new Vector2(0.2f, 0);
+                colorContainer.Colour = buttonColor;
+                glowContainer.FadeIn(hover_duration, Easing.OutQuint);
+            }
+            else
+            {
+                colorContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutQuint);
+                colorContainer.Shear = new Vector2(0);
+                colorContainer.Colour = Color4.Transparent;
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutQuint);
+                glowContainer.FadeOut(hover_duration, Easing.OutQuint);
+            }
+        }
+
+        private void updateGlow()
+        {
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColor.R, ButtonColor.G, ButtonColor.B, 0f), ButtonColor);
+            centerGlow.Colour = ButtonColor;
+            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColor, new Color4(ButtonColor.R, ButtonColor.G, ButtonColor.B, 0f));
         }
     }
 }

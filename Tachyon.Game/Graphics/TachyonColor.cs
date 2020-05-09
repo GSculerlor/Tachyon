@@ -93,6 +93,12 @@ namespace Tachyon.Game.Graphics
         public readonly Color4 BlueDark = FromHex(@"44aadd");
         public readonly Color4 BlueDarker = FromHex(@"2299bb");
         
+        public readonly Color4 GreenLighter = FromHex(@"eeffcc");
+        public readonly Color4 GreenLight = FromHex(@"b3d944");
+        public readonly Color4 Green = FromHex(@"88b300");
+        public readonly Color4 GreenDark = FromHex(@"668800");
+        public readonly Color4 GreenDarker = FromHex(@"445500");
+        
         public readonly Color4 RedLighter = FromHex(@"ffeded");
         public readonly Color4 RedLight = FromHex(@"ed7787");
         public readonly Color4 Red = FromHex(@"ed1121");
