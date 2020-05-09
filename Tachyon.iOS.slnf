@@ -1,0 +1,11 @@
+﻿{
+  "solution": {
+    "path": "Tachyon.sln",
+    "projects": [
+      "Tachyon.Game\\Tachyon.Game.csproj",
+      "Tachyon.Game.Tests\\Tachyon.Game.Tests.csproj",
+      "Tachyon.Resources\\Tachyon.Resources.csproj",
+      "Tachyon.iOS\\Tachyon.iOS.csproj"
+    ]
+  }
+}
