@@ -83,7 +83,7 @@ namespace Tachyon.Game.Screens.Select
                                             {
                                                 Origin = Anchor.Centre,
                                                 Anchor = Anchor.Centre,
-                                                Height = 180,
+                                                Height = 200,
                                                 RelativeSizeAxes = Axes.X,
                                                 ClickedAction = () => FinaliseSelection()
                                             },

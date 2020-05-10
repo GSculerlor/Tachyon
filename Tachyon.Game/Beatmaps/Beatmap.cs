@@ -15,6 +15,7 @@ namespace Tachyon.Game.Beatmaps
             {
                 Artist = @"Unknown",
                 Title = @"Unknown",
+                Author = @"Unknown"
             },
             Version = @"Normal",
             BaseDifficulty = new BeatmapDifficulty()

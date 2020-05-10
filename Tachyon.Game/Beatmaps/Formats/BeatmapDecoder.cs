@@ -225,6 +225,10 @@ namespace Tachyon.Game.Beatmaps.Formats
                 case @"Version":
                     outputBeatmap.BeatmapInfo.Version = pair.Value;
                     break;
+                
+                case @"Creator":
+                    metadata.Author = pair.Value;
+                    break;
 
                 case @"Source":
                     metadata.Source = pair.Value;

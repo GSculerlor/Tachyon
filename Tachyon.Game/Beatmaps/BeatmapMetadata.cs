@@ -22,6 +22,13 @@ namespace Tachyon.Game.Beatmaps
 
         [JsonIgnore]
         public List<BeatmapSetInfo> BeatmapSets { get; set; }
+        
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
+        [JsonProperty(@"creator")]
+        [Column("Author")]
+        public string Author { get; set; }
 
         public string Source { get; set; }
 
@@ -54,6 +61,7 @@ namespace Tachyon.Game.Beatmaps
                    && TitleUnicode == other.TitleUnicode
                    && Artist == other.Artist
                    && ArtistUnicode == other.ArtistUnicode
+                   && Author == other.Author
                    && Source == other.Source
                    && Tags == other.Tags
                    && PreviewTime == other.PreviewTime

@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -14,6 +19,7 @@ using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Beatmaps.Drawables;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
+using Tachyon.Game.Rulesets.UI;
 
 namespace Tachyon.Game.Screens.Select.Detail
 {
@@ -48,12 +54,6 @@ namespace Tachyon.Game.Screens.Select.Detail
             Masking = true;
             BorderColour = colors.Blue;
             Alpha = 0;
-            /*EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = colors.BlueLighter,
-                Radius = 10,
-            };*/
         }
         
         public override bool IsPresent => base.IsPresent || DetailContent == null;
@@ -215,12 +215,19 @@ namespace Tachyon.Game.Screens.Select.Detail
                                 Truncate = true,
                                 Margin = new MarginPadding { Bottom = 16 }
                             },
-                            new TachyonSpriteText
+                            new FillFlowContainer
                             {
-                                Font = TachyonFont.GetFont(size: 16, weight: FontWeight.Bold),
-                                RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                Text = $"BPM {getBPMRange(beatmap.Beatmap)}"
+                                Margin = new MarginPadding { Top = 10 },
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Children = getMapper(metadata)
+                            },
+                            new FillFlowContainer
+                            {
+                                Margin = new MarginPadding { Top = 20 },
+                                Spacing = new Vector2(20, 0),
+                                AutoSizeAxes = Axes.Both,
+                                Children = getInfoLabels()
                             },
                         }
                     }
@@ -237,6 +244,52 @@ namespace Tachyon.Game.Screens.Select.Detail
                 ForceRedraw();
             }
             
+            private InfoLabel[] getInfoLabels()
+            {
+                var b = beatmap.Beatmap;
+
+                List<InfoLabel> labels = new List<InfoLabel>();
+
+                if (b?.HitObjects?.Any() == true)
+                {
+                    labels.Add(new InfoLabel(new BeatmapStatistic
+                    {
+                        Name = "Length",
+                        Icon = FontAwesome.Regular.Clock,
+                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
+                    }));
+
+                    labels.Add(new InfoLabel(new BeatmapStatistic
+                    {
+                        Name = "BPM",
+                        Icon = FontAwesome.Solid.Stopwatch,
+                        Content = getBPMRange(b),
+                    }));
+                }
+
+                return labels.ToArray();
+            }
+            
+            private TachyonSpriteText[] getMapper(BeatmapMetadata metadata)
+            {
+                if (string.IsNullOrEmpty(metadata.Author))
+                    return Array.Empty<TachyonSpriteText>();
+
+                return new[]
+                {
+                    new TachyonSpriteText
+                    {
+                        Text = "mapped by ",
+                        Font = TachyonFont.GetFont(size: 20),
+                    },
+                    new TachyonSpriteText
+                    {
+                        Text = metadata.Author,
+                        Font = TachyonFont.GetFont(size: 20, weight: FontWeight.SemiBold),
+                    }
+                };
+            }
+            
             private string getBPMRange(IBeatmap beatmap)
             {
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
@@ -245,7 +298,47 @@ namespace Tachyon.Game.Screens.Select.Detail
                 if (Precision.AlmostEquals(bpmMin, bpmMax))
                     return $"{bpmMin:0}";
 
-                return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
+                return $"BPM {bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
+            }
+            
+            public class InfoLabel : Container, IHasTooltip
+            {
+                public string TooltipText { get; }
+
+                public InfoLabel(BeatmapStatistic statistic)
+                {
+                    TooltipText = statistic.Name;
+                    AutoSizeAxes = Axes.Both;
+
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Size = new Vector2(20),
+                            Children = new[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Scale = new Vector2(0.8f),
+                                    Icon = statistic.Icon,
+                                },
+                            }
+                        },
+                        new TachyonSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = TachyonFont.GetFont(weight: FontWeight.Bold, size: 18),
+                            Margin = new MarginPadding { Left = 30 },
+                            Text = statistic.Content,
+                        }
+                    };
+                }
             }
         }
     }
