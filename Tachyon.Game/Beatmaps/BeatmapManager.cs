@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using SharpCompress.Archives.Zip;
 using Tachyon.Game.Beatmaps.Formats;
 using Tachyon.Game.Database;
 using Tachyon.Game.IO;
 using Tachyon.Game.IO.Archives;
 using Tachyon.Game.Rulesets.Objects;
+using Decoder = Tachyon.Game.Beatmaps.Formats.Decoder;
 
 namespace Tachyon.Game.Beatmaps
 {
@@ -31,6 +34,7 @@ namespace Tachyon.Game.Beatmaps
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
         private readonly GameHost host;
+        private readonly Storage exportStorage;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
@@ -41,6 +45,7 @@ namespace Tachyon.Game.Beatmaps
 
             DefaultBeatmap = defaultBeatmap;
             beatmaps = (BeatmapStore) ModelStore;
+            exportStorage = storage.GetStorageForDirectory("exports");
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
@@ -163,6 +168,45 @@ namespace Tachyon.Game.Beatmaps
             var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
 
             return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
+        }
+        
+        public void Save(BeatmapInfo info, IBeatmap beatmapContent)
+        {
+            var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
+
+            using (var stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new BeatmapEncoder(beatmapContent).Encode(sw);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+            }
+
+            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+            if (working != null)
+                workingCache.Remove(working);
+        }
+        
+        /// <summary>
+        /// Exports a <see cref="BeatmapSetInfo"/> to an .osz package.
+        /// </summary>
+        /// <param name="set">The <see cref="BeatmapSetInfo"/> to export.</param>
+        public void Export(BeatmapSetInfo set)
+        {
+            var localSet = QueryBeatmapSet(s => s.ID == set.ID);
+
+            using (var archive = ZipArchive.Create())
+            {
+                foreach (var file in localSet.Files)
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+
+                using (var outputStream = exportStorage.GetStream($"{set}.osz", FileAccess.Write, FileMode.Create))
+                    archive.SaveTo(outputStream);
+
+                exportStorage.OpenInNativeExplorer();
+            }
         }
 
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);

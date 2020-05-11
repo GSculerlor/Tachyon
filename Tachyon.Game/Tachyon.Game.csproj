@@ -13,7 +13,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Tachyon.Resources\Tachyon.Resources.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Generator\Patterns" />
-  </ItemGroup>
 </Project>

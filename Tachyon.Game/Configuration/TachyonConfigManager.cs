@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using Tachyon.Game.Generator;
 
 namespace Tachyon.Game.Configuration
 {
@@ -10,6 +11,8 @@ namespace Tachyon.Game.Configuration
             Set(TachyonSetting.ShowFpsDisplay, false);
             
             Set(TachyonSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+
+            Set(TachyonSetting.GenerationType, GenerationType.Random);
         }
 
         public TachyonConfigManager(Storage storage) : base(storage)
@@ -21,5 +24,6 @@ namespace Tachyon.Game.Configuration
     {
         ShowFpsDisplay,
         UIScale,
+        GenerationType
     }
 }

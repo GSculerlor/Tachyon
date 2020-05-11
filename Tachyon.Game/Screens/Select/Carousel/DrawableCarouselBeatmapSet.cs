@@ -137,6 +137,8 @@ namespace Tachyon.Game.Screens.Select.Carousel
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new TachyonMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
                 
+                items.Add(new TachyonMenuItem("Export", MenuItemType.Standard, () => manager.Export(beatmapSet)));
+                
                 items.Add(new TachyonMenuItem("Delete", MenuItemType.Destructive, () => manager.Delete(beatmapSet)));
                 
                 return items.ToArray();

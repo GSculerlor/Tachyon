@@ -1,18 +1,25 @@
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Generator;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
+using Tachyon.Game.Graphics.UserInterface;
 
 namespace Tachyon.Game.Screens.Select.Carousel
 {
-    public class DrawableCarouselBeatmap : DrawableCarouselItem
+    public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
+        private BeatmapGenerator beatmapGenerator;
+        
         private readonly BeatmapInfo beatmap;
 
         private Sprite background;
@@ -84,6 +91,25 @@ namespace Tachyon.Game.Screens.Select.Carousel
             base.Deselected();
 
             background.Colour = new Color4(34, 40, 49, 255);
+        }
+        
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Item.State.Value == CarouselItemState.Selected)
+                    items.Add(new TachyonMenuItem("Generate Beatmap", MenuItemType.Highlighted, handleGenerateBeatmap));
+                
+                return items.ToArray();
+            }
+        }
+
+        private void handleGenerateBeatmap()
+        {
+            AddInternal(beatmapGenerator = new BeatmapGenerator());
+            beatmapGenerator.Generate();
         }
     }
 }

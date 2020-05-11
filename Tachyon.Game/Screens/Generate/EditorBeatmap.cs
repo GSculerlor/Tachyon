@@ -218,6 +218,6 @@ namespace Tachyon.Game.Screens.Generate
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
-        public int BeatDivisor => beatDivisor?.Value ?? 1;
+        public int BeatDivisor => beatDivisor?.Value ?? 4;
     }
 }

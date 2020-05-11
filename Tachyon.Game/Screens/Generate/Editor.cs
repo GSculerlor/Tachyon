@@ -260,14 +260,6 @@ namespace Tachyon.Game.Screens.Generate
             else
                 clock.Start();
         }
-        
-        /*private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
-
-        private void exportBeatmap()
-        {
-            saveBeatmap();
-            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
-        }*/
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 

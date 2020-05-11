@@ -46,6 +46,8 @@ namespace Tachyon.Game.Screens.Generate.Components
                 Depth = float.MaxValue
             });
 
+            AddInternal(new CenterMarker { Depth = float.MaxValue });
+            
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(working);
