@@ -29,6 +29,8 @@ namespace Tachyon.Game.Input
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+            
+            new KeyBinding(InputKey.F12, GlobalAction.Waveform), 
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -42,5 +44,8 @@ namespace Tachyon.Game.Input
         
         [Description("Back")]
         Back,
+        
+        [Description("Show/Hide Waveform")]
+        Waveform,
     }
 }

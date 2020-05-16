@@ -1,17 +1,22 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
 using Tachyon.Game.Graphics;
+using Tachyon.Game.Input;
 
 namespace Tachyon.Game.Screens.Generate.Components
 {
-    public class TimelineArea : Container
+    public class TimelineArea : Container, IKeyBindingHandler<GlobalAction>
     {
         private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
         protected override Container<Drawable> Content => timeline;
+        
+        private readonly BindableBool shouldShowWaveform = new BindableBool(true);
 
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
@@ -81,10 +86,27 @@ namespace Tachyon.Game.Screens.Generate.Components
                             timeline
                         }, 
                     }
-                }, 
+                },
             };
+            
+            timeline.WaveformVisible.BindTo(shouldShowWaveform);
         }
         
         private void changeZoom(float change) => timeline.Zoom += change;
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Waveform:
+                    shouldShowWaveform.Value = !shouldShowWaveform.Value;
+                    return true;
+            }
+            
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+        }
     }
 }

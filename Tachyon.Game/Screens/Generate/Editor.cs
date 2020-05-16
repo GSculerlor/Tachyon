@@ -1,5 +1,6 @@
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,7 @@ using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
 using Tachyon.Game.Rulesets;
+using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.Screens.Generate.Components;
 
 namespace Tachyon.Game.Screens.Generate
@@ -36,6 +38,9 @@ namespace Tachyon.Game.Screens.Generate
 
         [Resolved] 
         private BeatmapManager beatmapManager { get; set; }
+        
+        [Cached]
+        private Bindable<HitObject> selectedHitObject = new Bindable<HitObject>();
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private EditorClock clock;
@@ -81,6 +86,19 @@ namespace Tachyon.Game.Screens.Generate
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new Container
+                    {
+                        Name = "Screen container",
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = 110, Bottom = 60 },
+                        Child = new Container
+                        {
+                            Padding = new MarginPadding(10),
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            Child = new TimingScreen(),
+                        }
+                    },
                     new Container
                     {
                         Name = "Timeline",
@@ -167,6 +185,17 @@ namespace Tachyon.Game.Screens.Generate
             clock.ProcessFrame();
         }
         
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            
+            selectedHitObject.BindValueChanged(selected =>
+            {
+                if (selected.NewValue != null)
+                    clock.Seek(selected.NewValue.StartTime);
+            });
+        }
+
         private double scrollAccumulation;
 
         protected override bool OnScroll(ScrollEvent e)

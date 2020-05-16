@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -20,6 +22,10 @@ namespace Tachyon.Game.Generator
 {
     public class BeatmapGenerator : Component, IBeatSnapProvider
     {
+        private const double amplitude_threshold = 0.050;
+        private const double intensity_threshold = 0.250;
+        
+        
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
@@ -33,6 +39,8 @@ namespace Tachyon.Game.Generator
 
         private EditorBeatmap editorBeatmap;
         private EditorClock clock;
+
+        private List<Waveform.Point> points;
 
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> working, TachyonRuleset ruleset, TachyonConfigManager config)
@@ -62,6 +70,8 @@ namespace Tachyon.Game.Generator
             {
                 playableBeatmap = working.Value.GetPlayableBeatmap(ruleset.RulesetInfo);
                 editorBeatmap = new EditorBeatmap(playableBeatmap);
+
+                points = working.Value.Waveform.GetPoints();
             }
             catch (Exception e)
             {
@@ -85,6 +95,8 @@ namespace Tachyon.Game.Generator
             }
             
             Debug.Assert(editorBeatmap != null);
+            Debug.Assert(points.Count > 0);
+            
             Logger.Log($"Generating beatmap using {generationType.Value.GetDescription()}");
             
             if (generationType.Value == GenerationType.Random)
@@ -125,13 +137,44 @@ namespace Tachyon.Game.Generator
 
         private void generateEpicBeatmap()
         {
+            
+            
+            var timingpoints = working.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
+            clock.Seek(timingpoints[0].Time);
+
+            while (clock.CurrentTime < working.Value.Track.Length)
+            {
+                //If the amplitude is below threshold, skip it.
+                if (points[(int) clock.CurrentTime].Amplitude[0] < amplitude_threshold && points[(int) clock.CurrentTime].Amplitude[1] < amplitude_threshold)
+                    seek(2);
+                //if the mid intensity is low, skip it.
+                else if (points[(int) clock.CurrentTime].MidIntensity < intensity_threshold)
+                    seek(2);
+                else {
+                    var amplitudeAverage = (points[(int) clock.CurrentTime].Amplitude[0] + points[(int) clock.CurrentTime].Amplitude[1]) / 2;
+                    var intensityAverage = (points[(int) clock.CurrentTime].HighIntensity + points[(int) clock.CurrentTime].LowIntensity) / 2;
+                    
+                    if (points[(int)clock.CurrentTime].HighIntensity >= points[(int)clock.CurrentTime].LowIntensity)
+                        if (amplitudeAverage > 0.5)
+                            createUpperNote(clock.CurrentTime);
+                        else
+                            createLowerNote(clock.CurrentTime);
+                    else
+                        if (intensityAverage > 0.75)
+                            createUpperNote(clock.CurrentTime);
+                        else
+                            createLowerNote(clock.CurrentTime);
+
+                    seek(2);
+                }
+            }
+            
             Save();
         }
 
         private void createUpperNote(double startTime)
         {
-            var upperNote = new Note();
-            upperNote.StartTime = startTime;
+            var upperNote = new Note { StartTime = startTime };
             upperNote.Samples.Add(new HitSampleInfo
             {
                 Name = HitSampleInfo.HIT_CLAP
@@ -142,8 +185,7 @@ namespace Tachyon.Game.Generator
         
         private void createLowerNote(double startTime)
         {
-            var lowerNote = new Note();
-            lowerNote.StartTime = startTime;
+            var lowerNote = new Note { StartTime = startTime };
             lowerNote.Samples.Add(new HitSampleInfo
             {
                 Name = HitSampleInfo.HIT_NORMAL
