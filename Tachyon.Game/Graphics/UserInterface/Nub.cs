@@ -51,9 +51,9 @@ namespace Tachyon.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
-            AccentColour = colors.Pink;
-            GlowingAccentColour = colors.PinkLighter;
-            GlowColour = colors.PinkDarker;
+            AccentColour = colors.Blue;
+            GlowingAccentColour = colors.BlueLighter;
+            GlowColour = colors.BlueDarker;
 
             EdgeEffect = new EdgeEffectParameters
             {

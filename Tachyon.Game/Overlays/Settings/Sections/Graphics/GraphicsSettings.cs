@@ -7,9 +7,9 @@ using Tachyon.Game.Overlays.Settings.Items;
 
 namespace Tachyon.Game.Overlays.Settings.Sections.Graphics
 {
-    public class FrameLimiterSettings : SettingsSubsection
+    public class GraphicsSettings : SettingsSubsection
     {
-        protected override string Header => "Frame Limiter";
+        protected override string Header => "Graphics";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, TachyonConfigManager tachyonConfig)

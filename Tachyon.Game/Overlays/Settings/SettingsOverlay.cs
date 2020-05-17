@@ -17,7 +17,7 @@ namespace Tachyon.Game.Overlays.Settings
             new BeatmapGeneratorSection(), 
         };
 
-        protected override Drawable CreateHeader() => new SettingsHeader("Settings", "Personalize your game behavior");
+        protected override Drawable CreateHeader() => new SettingsHeader("Settings", "Lmao yeah, not so useful but okay");
 
 
         [BackgroundDependencyLoader]

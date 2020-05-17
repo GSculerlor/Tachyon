@@ -48,7 +48,7 @@ namespace Tachyon.Game.Graphics.UserInterface
         public TachyonSliderBar()
         {
             Height = 12;
-            RangePadding = 20;
+            RangePadding = 12;
             Children = new Drawable[]
             {
                 leftBox = new Box
@@ -88,7 +88,7 @@ namespace Tachyon.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(TachyonColor colors)
         {
-            AccentColour = colors.Pink;
+            AccentColour = colors.Blue;
         }
 
         protected override void Update()

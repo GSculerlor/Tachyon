@@ -17,6 +17,7 @@ namespace Tachyon.Game.Graphics.UserInterface
         public Box TextLayer;
 
         private const int transform_time = 600;
+        private readonly Vector2 shear = new Vector2(5f / 50, 0);
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(100, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(80, 50);
@@ -39,9 +40,9 @@ namespace Tachyon.Game.Graphics.UserInterface
             set
             {
                 base.Origin = value;
-                c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
+                c1.Origin = c1.Anchor = value;
 
-                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? 5f : 0;
 
                 Remove(c1);
                 c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
@@ -52,14 +53,14 @@ namespace Tachyon.Game.Graphics.UserInterface
         public HoverableBackButton()
         {
             Size = SIZE_RETRACTED;
-            Shear = new Vector2(5f / 50, 0);
+            Shear = shear;
 
             Children = new Drawable[]
             {
                 c1 = new Container
                 {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
                     Width = 1f,
                     Children = new Drawable[]

@@ -138,7 +138,7 @@ namespace Tachyon.Game.Graphics.UserInterface
                 {
                     BackgroundColour = Color4.Transparent;
 
-                    nonAccentHoverColour = colors.PinkDarker;
+                    nonAccentHoverColour = colors.BlueDarker;
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
                 }
@@ -235,7 +235,7 @@ namespace Tachyon.Game.Graphics.UserInterface
             private void load(TachyonColor colors)
             {
                 BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colors.PinkDarker;
+                BackgroundColourHover = colors.BlueDarker;
             }
         }
     }

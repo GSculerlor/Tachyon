@@ -11,7 +11,7 @@ namespace Tachyon.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new FrameLimiterSettings(), 
+                new GraphicsSettings(), 
             };
         }
     }

@@ -61,7 +61,6 @@ namespace Tachyon.Game.Overlays.Toolbar
                                 }, 
                                 new ToolbarSettingsButton(),
                                 new ToolbarMusicButton(),
-                                new ToolbarFullscreenButton(), 
                             }
                         }
                     }
