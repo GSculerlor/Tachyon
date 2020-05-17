@@ -177,7 +177,7 @@ namespace Tachyon.Game.Screens.Generate.Components
 
                     case HitSampleInfo.HIT_FINISH:
                         return new RowAttribute("Lower Note", () => "Finish");
-                    
+                        
                     case HitSampleInfo.HIT_NORMAL:
                         return new RowAttribute("Lower Note", () => "Normal");
                 }

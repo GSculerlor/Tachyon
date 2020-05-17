@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Sprites;
 
@@ -37,7 +38,7 @@ namespace Tachyon.Game.Screens.Generate.Components
             {
                 new Box
                 {
-                    Colour = colors.Yellow,
+                    Colour = header.Contains("Upper") ? colors.UpperHitObject : colors.LowerHitObject,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new TachyonSpriteText
@@ -47,7 +48,7 @@ namespace Tachyon.Game.Screens.Generate.Components
                     Origin = Anchor.Centre,
                     Font = TachyonFont.Default.With(weight: FontWeight.SemiBold, size: 18),
                     Text = header,
-                    Colour = colors.Gray3
+                    Colour = Color4.White
                 },
             };
         }

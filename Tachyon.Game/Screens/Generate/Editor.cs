@@ -128,13 +128,11 @@ namespace Tachyon.Game.Screens.Generate
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Right = 5 },
                                             },
-                                            new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                         },
                                     },
                                     ColumnDimensions = new[]
                                     {
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 90),
                                     }
                                 },
                             }
