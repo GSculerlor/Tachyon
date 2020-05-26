@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>rtachyon</id>
+        <version>0.0.0</version>
+        <title>Tachyon</title>
+        <authors>GSculerlor</authors>
+        <owners>GSculerlor</owners>
+        <projectUrl>https://ganen.moe/</projectUrl>
+        <iconUrl>https://gsculerlor.s-ul.eu/qPqycKN9</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Tachyon</description>
+        <summary>Tachyon</summary>
+        <releaseNotes>testing</releaseNotes>
+        <copyright>Copyright (c) 2020 GSculerlor</copyright>
+        <language>en-AU</language>
+    </metadata>
+    <files>
+      <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
+      <file src="**.dll" target="lib\net45\"/>
+      <file src="**.config" target="lib\net45\"/>
+    </files>
+</package>
+
