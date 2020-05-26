@@ -1,6 +1,7 @@
 ﻿using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Rulesets;
 
 namespace Tachyon.Game.Beatmaps
@@ -15,6 +16,6 @@ namespace Tachyon.Game.Beatmaps
         
         Track Track { get; }
         
-        Waveform Waveform { get; }
+        TachyonWaveform Waveform { get; }
     }
 }

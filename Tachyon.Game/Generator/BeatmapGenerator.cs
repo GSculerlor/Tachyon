@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -13,6 +12,7 @@ using Tachyon.Game.Audio;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Configuration;
 using Tachyon.Game.Generator.Patterns;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Rulesets;
 using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.Screens.Generate;
@@ -40,7 +40,7 @@ namespace Tachyon.Game.Generator
         private EditorBeatmap editorBeatmap;
         private EditorClock clock;
 
-        private List<Waveform.Point> points;
+        private List<TachyonWaveform.WaveformSection> sections;
 
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> working, TachyonRuleset ruleset, TachyonConfigManager config)
@@ -71,7 +71,7 @@ namespace Tachyon.Game.Generator
                 playableBeatmap = working.Value.GetPlayableBeatmap(ruleset.RulesetInfo);
                 editorBeatmap = new EditorBeatmap(playableBeatmap);
 
-                points = working.Value.Waveform.GetPoints();
+                sections = working.Value.Waveform.GetWaveformSections();
             }
             catch (Exception e)
             {
@@ -95,7 +95,7 @@ namespace Tachyon.Game.Generator
             }
             
             Debug.Assert(editorBeatmap != null);
-            Debug.Assert(points.Count > 0);
+            Debug.Assert(sections.Count > 0);
             
             Logger.Log($"Generating beatmap using {generationType.Value.GetDescription()}");
             
@@ -137,24 +137,22 @@ namespace Tachyon.Game.Generator
 
         private void generateEpicBeatmap()
         {
-            
-            
             var timingpoints = working.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
             clock.Seek(timingpoints[0].Time);
 
             while (clock.CurrentTime < working.Value.Track.Length)
             {
                 //If the amplitude is below threshold, skip it.
-                if (points[(int) clock.CurrentTime].Amplitude[0] < amplitude_threshold && points[(int) clock.CurrentTime].Amplitude[1] < amplitude_threshold)
+                if (sections[(int) clock.CurrentTime].Amplitude[0] < amplitude_threshold && sections[(int) clock.CurrentTime].Amplitude[1] < amplitude_threshold)
                     seek(2);
                 //if the mid intensity is low, skip it.
-                else if (points[(int) clock.CurrentTime].MidIntensity < intensity_threshold)
+                else if (sections[(int) clock.CurrentTime].MidIntensity < intensity_threshold)
                     seek(2);
                 else {
-                    var amplitudeAverage = (points[(int) clock.CurrentTime].Amplitude[0] + points[(int) clock.CurrentTime].Amplitude[1]) / 2;
-                    var intensityAverage = (points[(int) clock.CurrentTime].HighIntensity + points[(int) clock.CurrentTime].LowIntensity) / 2;
+                    var amplitudeAverage = (sections[(int) clock.CurrentTime].Amplitude[0] + sections[(int) clock.CurrentTime].Amplitude[1]) / 2;
+                    var intensityAverage = (sections[(int) clock.CurrentTime].HighIntensity + sections[(int) clock.CurrentTime].LowIntensity) / 2;
                     
-                    if (points[(int)clock.CurrentTime].HighIntensity >= points[(int)clock.CurrentTime].LowIntensity)
+                    if (sections[(int)clock.CurrentTime].HighIntensity >= sections[(int)clock.CurrentTime].LowIntensity)
                         if (amplitudeAverage > 0.5)
                             createUpperNote(clock.CurrentTime);
                         else
@@ -188,7 +186,7 @@ namespace Tachyon.Game.Generator
             var lowerNote = new Note { StartTime = startTime };
             lowerNote.Samples.Add(new HitSampleInfo
             {
-                Name = HitSampleInfo.HIT_NORMAL
+                Name = HitSampleInfo.HIT_FINISH
             });
             
             addHitObject(lowerNote);

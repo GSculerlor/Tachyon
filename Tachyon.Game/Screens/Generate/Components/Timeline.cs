@@ -4,11 +4,11 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osuTK;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
 
@@ -31,18 +31,18 @@ namespace Tachyon.Game.Screens.Generate.Components
             ScrollbarVisible = false;
         }
 
-        private WaveformGraph waveform;
+        private TachyonWaveformGraph waveform;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> working, TachyonColor colors)
         {
-            Add(waveform = new WaveformGraph
+            Add(waveform = new TachyonWaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colors.Red.Opacity(0.2f),
-                LowColour = colors.RedLighter,
-                MidColour = colors.RedDark,
-                HighColour = colors.RedDarker,
+                LowColor = colors.RedLighter,
+                MidColor = colors.RedDark,
+                HighColor = colors.RedDarker,
                 Depth = float.MaxValue
             });
 

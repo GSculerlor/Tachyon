@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +11,7 @@ using osuTK;
 using osuTK.Graphics;
 using Tachyon.Game.Audio;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Graphics.Sprites;
@@ -27,7 +27,7 @@ namespace Tachyon.Game.Screens.Generate.Components
 
         private readonly FillFlowContainer backgroundFlow;
 
-        private List<Waveform.Point> points;
+        private List<TachyonWaveform.WaveformSection> sections;
         
         public HitObjectTable()
         {
@@ -49,7 +49,7 @@ namespace Tachyon.Game.Screens.Generate.Components
         [BackgroundDependencyLoader]
         private void load(Bindable<WorkingBeatmap> working)
         {
-            points = working.Value.Waveform.GetPoints();
+            sections = working.Value.Waveform.GetWaveformSections();
         }
         
         public IEnumerable<HitObject> HitObjects
@@ -109,27 +109,27 @@ namespace Tachyon.Game.Screens.Generate.Components
             },
             new TachyonSpriteText
             {
-                Text = $"{points[(int) hitObject.StartTime].Amplitude[0]:0.000}",
+                Text = $"{sections[(int) hitObject.StartTime].Amplitude[0]:0.000}",
                 Font = TachyonFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new TachyonSpriteText
             {
-                Text = $"{points[(int) hitObject.StartTime].Amplitude[1]:0.000}",
+                Text = $"{sections[(int) hitObject.StartTime].Amplitude[1]:0.000}",
                 Font = TachyonFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new TachyonSpriteText
             {
-                Text = $"{points[(int) hitObject.StartTime].LowIntensity:0.000}",
+                Text = $"{sections[(int) hitObject.StartTime].LowIntensity:0.000}",
                 Font = TachyonFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new TachyonSpriteText
             {
-                Text = $"{points[(int) hitObject.StartTime].MidIntensity:0.000}",
+                Text = $"{sections[(int) hitObject.StartTime].MidIntensity:0.000}",
                 Font = TachyonFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new TachyonSpriteText
             {
-                Text = $"{points[(int) hitObject.StartTime].HighIntensity:0.000}",
+                Text = $"{sections[(int) hitObject.StartTime].HighIntensity:0.000}",
                 Font = TachyonFont.GetFont(size: text_size, weight: FontWeight.Bold)
             }
         };
@@ -177,9 +177,6 @@ namespace Tachyon.Game.Screens.Generate.Components
 
                     case HitSampleInfo.HIT_FINISH:
                         return new RowAttribute("Lower Note", () => "Finish");
-                        
-                    case HitSampleInfo.HIT_NORMAL:
-                        return new RowAttribute("Lower Note", () => "Normal");
                 }
 
                 return null;

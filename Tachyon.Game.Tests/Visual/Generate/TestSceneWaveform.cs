@@ -1,13 +1,12 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Graphics.Sprites;
 
 namespace Tachyon.Game.Tests.Visual.Generate
@@ -97,9 +96,9 @@ namespace Tachyon.Game.Tests.Visual.Generate
             AddUntilStep("wait for load", () => graph.ResampledWaveform != null);
         }
 
-        public class TestWaveformGraph : WaveformGraph
+        public class TestWaveformGraph : TachyonWaveformGraph
         {
-            public new Waveform ResampledWaveform => base.ResampledWaveform;
+            public new TachyonWaveform ResampledWaveform => base.ResampledWaveform;
         }
     }
 }

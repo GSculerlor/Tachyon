@@ -7,6 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.Rulesets;
 using Tachyon.Game.Rulesets.Objects.Types;
 
@@ -33,7 +34,7 @@ namespace Tachyon.Game.Beatmaps
 
             track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(1000));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
-            waveform = new RecyclableLazy<Waveform>(GetWaveform);
+            waveform = new RecyclableLazy<TachyonWaveform>(GetWaveform);
 
             total_count.Value++;
         }
@@ -162,9 +163,9 @@ namespace Tachyon.Game.Beatmaps
         private RecyclableLazy<Track> track;
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
-        public Waveform Waveform => waveform.Value;
-        protected virtual Waveform GetWaveform() => new Waveform(null);
-        private readonly RecyclableLazy<Waveform> waveform;
+        public TachyonWaveform Waveform => waveform.Value;
+        protected virtual TachyonWaveform GetWaveform() => new TachyonWaveform(null);
+        private readonly RecyclableLazy<TachyonWaveform> waveform;
 
         public virtual void TransferTo(WorkingBeatmap other)
         {

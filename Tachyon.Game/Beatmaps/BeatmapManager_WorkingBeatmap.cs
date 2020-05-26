@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using Tachyon.Game.Beatmaps.Formats;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.IO;
 
 namespace Tachyon.Game.Beatmaps
@@ -83,12 +84,12 @@ namespace Tachyon.Game.Beatmaps
                     owb.textureStore = textureStore;
             }
             
-            protected override Waveform GetWaveform()
+            protected override TachyonWaveform GetWaveform()
             {
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new Waveform(trackData);
+                    return trackData == null ? null : new TachyonWaveform(trackData);
                 }
                 catch (Exception e)
                 {

@@ -5,6 +5,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using Tachyon.Game.Beatmaps;
 using Tachyon.Game.Beatmaps.Formats;
+using Tachyon.Game.Generator.Waveforms;
 using Tachyon.Game.IO;
 using Tachyon.Game.IO.Archives;
 using Tachyon.Game.Tests.Beatmaps;
@@ -40,7 +41,7 @@ namespace Tachyon.Game.Tests
 
         protected override Texture GetBackground() => null;
 
-        protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
+        protected override TachyonWaveform GetWaveform() => new TachyonWaveform(trackStore.GetStream(firstAudioFile));
 
         protected override Track GetTrack() => trackStore.Get(firstAudioFile);
 
