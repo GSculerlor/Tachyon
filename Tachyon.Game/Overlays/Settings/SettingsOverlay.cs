@@ -12,6 +12,7 @@ namespace Tachyon.Game.Overlays.Settings
     {
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
+            new PlayerSection(), 
             new GraphicsSection(),
             new AudioSection(),
             new BeatmapGeneratorSection(), 

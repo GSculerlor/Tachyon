@@ -50,7 +50,8 @@ namespace Tachyon.Game.Generator
             
             generationType = config.GetBindable<GenerationType>(TachyonSetting.GenerationType);
 
-            beatDivisor.Value = 4;
+            int divisor = (int) config.GetBindable<DivisorValue>(TachyonSetting.DivisorValue).Value;
+            beatDivisor.Value = divisor;
             
             var sourceClock = (IAdjustableClock) working.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(working.Value, beatDivisor) { IsCoupled = false };
@@ -127,7 +128,7 @@ namespace Tachyon.Game.Generator
                     default: 
                         createLowerNote(clock.CurrentTime);
 
-                        seek(4);
+                        seek(2);
                         break;
                 }
             }
@@ -144,10 +145,10 @@ namespace Tachyon.Game.Generator
             {
                 //If the amplitude is below threshold, skip it.
                 if (sections[(int) clock.CurrentTime].Amplitude[0] < amplitude_threshold && sections[(int) clock.CurrentTime].Amplitude[1] < amplitude_threshold)
-                    seek(2);
+                    seek(1);
                 //if the mid intensity is low, skip it.
                 else if (sections[(int) clock.CurrentTime].MidIntensity < intensity_threshold)
-                    seek(2);
+                    seek(1);
                 else {
                     var amplitudeAverage = (sections[(int) clock.CurrentTime].Amplitude[0] + sections[(int) clock.CurrentTime].Amplitude[1]) / 2;
                     var intensityAverage = (sections[(int) clock.CurrentTime].HighIntensity + sections[(int) clock.CurrentTime].LowIntensity) / 2;
@@ -163,7 +164,7 @@ namespace Tachyon.Game.Generator
                         else
                             createLowerNote(clock.CurrentTime);
 
-                    seek(2);
+                    seek(1);
                 }
             }
             
@@ -195,31 +196,31 @@ namespace Tachyon.Game.Generator
         private void createTriplet(double startTime)
         {
             createLowerNote(startTime);
-            seek(2);
+            seek(1);
             
             createUpperNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
             
             createUpperNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
         }
         
         private void createQuintuplet(double startTime)
         {
             createUpperNote(startTime);
-            seek(2);
+            seek(1);
             
             createLowerNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
             
             createLowerNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
             
             createUpperNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
             
             createLowerNote(clock.CurrentTime);
-            seek(2);
+            seek(1);
         }
 
         private void addHitObject(HitObject hitObject) => editorBeatmap.Add(hitObject);

@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osuTK.Input;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Configuration;
 using Tachyon.Game.Graphics.Containers;
 using Tachyon.Game.Rulesets;
 using Tachyon.Game.Rulesets.Scoring;
@@ -33,6 +34,9 @@ namespace Tachyon.Game.Screens.Play
         
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+        
+        [Resolved]
+        private TachyonConfigManager config { get; set; }
         
         [Resolved]
         private TachyonRuleset tachyonRuleset { get; set; }
@@ -358,17 +362,19 @@ namespace Tachyon.Game.Screens.Play
 
         private bool onFail()
         {
-            HasFailed = true;
+            if (!config.GetBindable<bool>(TachyonSetting.SuppressFail).Value)
+            {
+                HasFailed = true;
+                
+                if (PauseOverlay.State.Value == Visibility.Visible)
+                    PauseOverlay.Hide();
+                
+                failAnimation.Start();
+    
+                return true;
+            }
 
-            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
-            // could process an extra frame after the GameplayClock is stopped.
-            // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State.Value == Visibility.Visible)
-                PauseOverlay.Hide();
-            
-            failAnimation.Start();
-
-            return true;
+            return false;
         }
 
         // Called back when the transform finishes

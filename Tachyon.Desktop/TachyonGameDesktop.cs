@@ -19,7 +19,7 @@ namespace Tachyon.Desktop
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
                 
-                //desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "tachyon.ico"));
                 desktopWindow.Title = Name;
 
                 desktopWindow.FileDrop += fileDrop;

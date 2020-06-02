@@ -1,7 +1,6 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Platform;
 using Tachyon.Game.Configuration;
 using Tachyon.Game.Generator;
 using Tachyon.Game.Overlays.Settings.Items;
@@ -22,6 +21,12 @@ namespace Tachyon.Game.Overlays.Settings.Sections.BeatmapGenerator
                     LabelText = "Pattern Generation Algorithm",
                     Bindable = tachyonConfig.GetBindable<GenerationType>(TachyonSetting.GenerationType)
                 },
+                
+                new SettingsEnumDropdown<DivisorValue>
+                {
+                    LabelText = "Divisor Value",
+                    Bindable = tachyonConfig.GetBindable<DivisorValue>(TachyonSetting.DivisorValue)
+                }, 
             };
         }
     }

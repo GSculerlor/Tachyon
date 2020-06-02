@@ -4,10 +4,10 @@ namespace Tachyon.Game.Generator
 {
     public enum GenerationType
     {
-        [Description("Random Patterning")]
+        [Description("Random Note Placement")]
         Random,
         
-        [Description("Ganen's Big Brain Algorithm Patterning")]
+        [Description("Ganen's Big Brain Note Placement")]
         AudioBased
     }
 }

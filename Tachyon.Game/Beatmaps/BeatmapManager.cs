@@ -101,7 +101,7 @@ namespace Tachyon.Game.Beatmaps
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
-            LogForModel(beatmapSet, "Validating online IDs...");
+            LogForModel(beatmapSet, "Validating ID...");
 
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
