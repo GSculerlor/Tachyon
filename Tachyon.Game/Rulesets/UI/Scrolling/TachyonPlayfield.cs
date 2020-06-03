@@ -1,4 +1,6 @@
-﻿using Tachyon.Game.Rulesets.Objects;
+﻿using osu.Framework.Graphics;
+using Tachyon.Game.Rulesets.Audio;
+using Tachyon.Game.Rulesets.Objects;
 using Tachyon.Game.Rulesets.Objects.Drawables;
 
 namespace Tachyon.Game.Rulesets.UI.Scrolling
@@ -9,7 +11,11 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
 
         public TachyonPlayfield()
         {
-            AddInternal(rows = new DualRow(0));
+            AddRangeInternal(new Drawable[]
+            {
+                rows = new DualRow(0),
+                new HitSound(), 
+            });
         }
 
         public override void Add(DrawableHitObject h) => rows.Add(h);

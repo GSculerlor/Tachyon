@@ -11,6 +11,7 @@ namespace Tachyon.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 new VolumeSettings(), 
+                new OffsetSettings(), 
             };
         }
     }

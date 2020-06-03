@@ -15,6 +15,8 @@ using osu.Framework.Timing;
 using osuTK.Graphics;
 using osuTK.Input;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Configuration;
+using Tachyon.Game.Generator;
 using Tachyon.Game.Graphics;
 using Tachyon.Game.Graphics.UserInterface;
 using Tachyon.Game.Input;
@@ -55,9 +57,9 @@ namespace Tachyon.Game.Screens.Generate
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TachyonColor colors, GameHost host, TachyonRuleset ruleset)
+        private void load(TachyonColor colors, GameHost host, TachyonRuleset ruleset, TachyonConfigManager config)
         {
-            beatDivisor.Value = 4;
+            beatDivisor.Value = (int) config.GetBindable<DivisorValue>(TachyonSetting.DivisorValue).Value;
 
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };

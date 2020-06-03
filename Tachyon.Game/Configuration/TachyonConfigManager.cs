@@ -17,6 +17,8 @@ namespace Tachyon.Game.Configuration
             Set(TachyonSetting.GenerationType, GenerationType.Random);
 
             Set(TachyonSetting.DivisorValue, DivisorValue.Two);
+            
+            Set(TachyonSetting.AudioOffset, 0, -500.0, 500.0, 1);
         }
 
         public TachyonConfigManager(Storage storage) : base(storage)
@@ -30,6 +32,7 @@ namespace Tachyon.Game.Configuration
         ShowFpsDisplay,
         UIScale,
         GenerationType,
-        DivisorValue
+        DivisorValue,
+        AudioOffset,
     }
 }

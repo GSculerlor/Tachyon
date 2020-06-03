@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using Tachyon.Game.Beatmaps;
+using Tachyon.Game.Configuration;
 
 namespace Tachyon.Game.Screens.Play
 {
@@ -51,8 +52,9 @@ namespace Tachyon.Game.Screens.Play
         public readonly GameplayClock GameplayClock;
 
         private readonly FramedOffsetClock userOffsetClock;
-
         private readonly FramedOffsetClock platformOffsetClock;
+        
+        private Bindable<double> userAudioOffset;
 
         public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
         {
@@ -89,8 +91,11 @@ namespace Tachyon.Game.Screens.Play
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TachyonConfigManager config)
         {
+            userAudioOffset = config.GetBindable<double>(TachyonSetting.AudioOffset);
+            userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
+            
             // sane default provided by ruleset.
             double startTime = Math.Min(0, gameplayStartTime);
 
