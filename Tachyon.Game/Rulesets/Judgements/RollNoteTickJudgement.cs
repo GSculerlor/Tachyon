@@ -2,7 +2,7 @@
 
 namespace Tachyon.Game.Rulesets.Judgements
 {
-    public class HoldNoteTickJudgement : Judgement
+    public class RollNoteTickJudgement : Judgement
     {
         public override bool AffectsCombo => false;
 

@@ -79,7 +79,7 @@ namespace Tachyon.Game.Rulesets.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new HoldNoteJudgement();
+        public override Judgement CreateJudgement() => new RollNoteJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

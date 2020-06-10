@@ -24,7 +24,7 @@ namespace Tachyon.Game.Rulesets.Objects
         /// </summary>
         public double HitWindow => TickSpacing / 2;
 
-        public override Judgement CreateJudgement() => new HoldNoteTickJudgement();
+        public override Judgement CreateJudgement() => new RollNoteTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

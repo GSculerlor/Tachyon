@@ -84,8 +84,7 @@ namespace Tachyon.Game.Rulesets.UI.Scrolling
 
         public override bool Remove(DrawableHitObject h)
         {
-            var maniaObject = (TachyonHitObject)h.HitObject;
-            int columnIndex = maniaObject.Row - firstColumnIndex;
+            int columnIndex = ((TachyonHitObject)h.HitObject).Row - firstColumnIndex;
             Rows.ElementAt(columnIndex).Remove(h);
 
             return true;

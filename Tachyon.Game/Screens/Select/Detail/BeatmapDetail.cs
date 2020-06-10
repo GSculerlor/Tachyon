@@ -161,20 +161,20 @@ namespace Tachyon.Game.Screens.Select.Detail
                                 RelativeSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
                                 Shear = new Vector2(0.8f, 0),
-                                Alpha = 0.5f,
+                                Alpha = 0.7f,
                                 Children = new[]
                                 {
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Black,
-                                        Width = 0.4f,
+                                        Width = 0.5f,
                                     },
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                        Width = 0.05f,
+                                        Width = 0.1f,
                                     },
                                     new Box
                                     {
