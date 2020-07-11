@@ -105,6 +105,11 @@ namespace Tachyon.Game.Screens.Menu
             beatmaps.Update(setInfo);
             
             introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+            BeatmapSetInfo setInfo2 = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/credits.osz"), "credits.osz")).Result;
+            BeatmapSetInfo setInfo3 = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/otome.osz"), "otome.osz")).Result;
+            BeatmapSetInfo setInfo4 = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/eos.osz"), "eos.osz")).Result;
+
             track = introBeatmap.Track;
         }
         
