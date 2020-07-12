@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -7,18 +6,13 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.States;
 using Tachyon.Game.Configuration;
 using Tachyon.Game.Input.Bindings;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace Tachyon.Game.Rulesets
 {
     public abstract class RulesetInputManager<T> : PassThroughInputManager
         where T : struct
     {
-        protected override InputState CreateInitialState()
-        {
-            var state = base.CreateInitialState();
-            return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
-        }
+        protected override InputState CreateInitialState() => new RulesetInputManagerInputState(base.CreateInitialState());
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
@@ -50,11 +44,10 @@ namespace Tachyon.Game.Rulesets
         }
     }
     
-    public class RulesetInputManagerInputState<T> : InputState
-        where T : struct
+    public class RulesetInputManagerInputState : InputState
     {
-        public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
-            : base(mouse, keyboard, joystick)
+        public RulesetInputManagerInputState(InputState state = null)
+            : base(state)
         {
         }
     }
