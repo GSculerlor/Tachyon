@@ -14,7 +14,7 @@ namespace Tachyon.Presentation.Slides.Content
     public class SlidePerancanganAutoGeneratorRandom : SlideWithTitle
     {
         public SlidePerancanganAutoGeneratorRandom()
-            : base("Perancangan Beatmap Auto Generator Metode Random") { }
+            : base("Beatmap Auto Generator Metode Random") { }
 
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)

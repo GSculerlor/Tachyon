@@ -22,6 +22,19 @@ namespace Tachyon.Presentation
             //Title
             typeof(SlideTitle),
             
+            //Video
+            typeof(SlideTitleVideoTentangTugasAkhir),
+            typeof(SlideRumusanMasalah),
+            typeof(SlideBatasanMasalah),
+            typeof(SlideTujuan),
+            typeof(SlideManfaat),
+            typeof(SlideVideoTentang),
+            typeof(SlideTitleVideoHowItWorks),
+            typeof(SlidePerancanganAutoGeneratorRandom),
+            typeof(SlidePerancanganAutoGeneratorGanen),
+            typeof(SlideTitleVideoDemo),
+
+            
             //Pendahuluan
             typeof(SlideTitlePendahuluan),
             typeof(SlideLatarBelakang),
